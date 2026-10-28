@@ -1,0 +1,134 @@
+/* ==========================================================================
+   Roll'd Order Online — Typography + colour tokens (v1)
+   Single source of truth for font size, weight, line-height and tracking.
+   Reference page: design-system.html
+
+   Desktop values switch on html.is-desktop (the same class prototype.html
+   sets from ?view=desktop / the width media query), so one class name gives
+   the right size on both layouts.
+
+   Rules
+   - Two weights in use: 400 regular and 600 semibold. 700 is reserved.
+   - Each role has its own default weight token (--fw-title-1 …). Use it
+     instead of --fw-bold so a role's weight can change in one place.
+   - Only the sizes below. No 15.5px, no 17px, no 19px.
+   - Text inputs are always 16px (smaller triggers iOS zoom-on-focus).
+   ========================================================================== */
+
+:root{
+  --font-sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+
+  /* ---------- Colour ----------
+     Use the token, never the hex. Grouped by job; design-system.html shows the palette. */
+  /* Brand & actions */
+  --green-dark:#173d31;     /* Primary buttons, green headers, selected borders */
+  --green-mid:#1e5443;      /* Links, text buttons, outline-button text, store & item names */
+  --green-line:#1e5443;     /* Outline-button and order-type tile borders */
+  --green-pale:#bcdcc0;     /* Selected order-type tile on the store sheet */
+  --green-tint:#eaf2ea;     /* Selected radio card, time tile, category tab */
+  --green-bright:#1f9d55;   /* "Open" status (dot + label), location pin icons */
+  --gold:#e9c96a;           /* Cart count badge */
+  --cream:#faf5df;          /* Highlight fills */
+  --price:#d0421b;          /* Menu prices */
+  /* Text */
+  --text-primary:#111111;   /* Headings and main text */
+  --text-secondary:#333333; /* Addresses, secondary lines in cards */
+  --text-tertiary:#666666;  /* Descriptions, hints, sub-labels */
+  --text-muted:#8a8a8a;     /* Meta, overlines, distances, captions */
+  --text-disabled:#bbbbbb;  /* Disabled text, pill separators */
+  --text-on-dark:#ffffff;   /* Text on green buttons and headers */
+  /* Backgrounds */
+  --bg-page:#faf7f2;        /* Page background on every ordering screen */
+  --bg-surface:#ffffff;     /* Cards, sheets, fields */
+  --bg-subtle:#f3efe4;      /* Hover on desktop controls, quiet fills */
+  --bg-highlight:#fdf8ec;   /* Applied coupon, active Roll'd Dollars row */
+  --bg-loyalty:#f3efe6;     /* Loyalty landing page */
+  --bg-club:#afd7c5;        /* Rollers Club band on the landing page */
+  /* Borders & dividers */
+  --border:#dddddd;         /* Fields, cards, pills, chips */
+  --border-subtle:#eeeeee;  /* Card outlines, list dividers */
+  --border-warm:#ece7dc;    /* Desktop panel dividers */
+  --border-strong:#b9b9b9;  /* Unselected radio rings, closed-status dot */
+  /* Status */
+  --error:#c0392b;          /* Error text, invalid field borders */
+  --error-bg:#fbe1de;       /* Unavailable / error banners */
+  --closed:#b3261e;         /* "Closed" label on store cards */
+  /* Overlay */
+  --overlay:rgba(0,0,0,.45);/* Dim behind sheets and dialogs */
+
+  /* Weights */
+  --fw-regular:400;
+  --fw-semibold:600;
+  --fw-bold:700;
+
+  /* Default weight per role. Emphasis is semibold everywhere: titles,
+     headlines, callouts, overlines, badges, prices, links. --fw-bold (700)
+     is reserved: no role uses it, so nothing outweighs a heading. */
+  --fw-display:600;
+  --fw-title-1:600;
+  --fw-title-2:600;
+  --fw-title-3:600;
+  --fw-headline:600;
+  --fw-callout:600;
+  --fw-overline:600;
+
+  /* Size / line-height pairs — mobile */
+  --fs-display:28px;   --lh-display:1.2;    /* Confirmation heroes */
+  --fs-title-1:22px;   --lh-title-1:1.25;   /* Screen / page titles */
+  --fs-title-2:20px;   --lh-title-2:1.3;    /* Sheet & modal titles */
+  --fs-title-3:18px;   --lh-title-3:1.3;    /* Section headings in a screen */
+  --fs-headline:16px;  --lh-headline:1.35;  /* Card titles, totals, buttons, top-bar titles */
+  --fs-body:15px;      --lh-body:1.5;       /* Paragraphs, descriptions, rows */
+  --fs-callout:14px;   --lh-callout:1.4;    /* Compact item names, links, pills */
+  --fs-subhead:14px;   --lh-subhead:1.4;    /* Secondary lines in cards: store addresses, supporting info */
+  --fs-input:16px;     --lh-input:1.3;      /* Text fields — never below 16px */
+  --fs-footnote:13px;  --lh-footnote:1.4;   /* Meta: addresses, dates, hints */
+  --fs-caption:12px;   --lh-caption:1.3;    /* Badges, tags, form labels */
+  --fs-overline:11px;  --lh-overline:1.2;   /* Uppercase micro-labels */
+
+  --ls-overline:.06em;
+
+  /* Spacing — detail pages (menu item / meal deal) */
+  --space-page-x:20px;      /* left & right margin of all content */
+  --space-title-desc:8px;   /* item title → description */
+  --space-intro:24px;       /* description → first section */
+  --space-heading:12px;     /* section heading → its first row */
+  --space-row:12px;         /* option row → option row */
+  --space-chip:8px;         /* chip → chip (allergens, tags) */
+  --space-section:40px;     /* end of one section → next section heading */
+  --space-footer:110px;     /* bottom padding so the sticky footer never covers content */
+
+  /* Option card (choice rows, add-on rows). Outer edge → content is 16px: 1px border + 15px padding. */
+  --option-border:1px;
+  --option-pad:15px;
+  --option-control:20px;    /* radio / checkbox size, and the name's line-height */
+  --option-min-height:52px; /* 16 + 20 + 16 */
+  --option-gap:12px;        /* text ↔ control */
+  --option-radius:14px;
+}
+
+/* Desktop (1440 build manual, section 2): every text role keeps its mobile size.
+   Only a few page-level headings grow, and they set their own size where they're used:
+   menu store heading 40/44, menu category title 24/28, confirmation title 22/28, loyalty greeting 24/32. */
+
+/* --------------------------------------------------------------------------
+   Text styles — apply one per text element, then (optionally) one weight
+   modifier. Each style ships with its default weight.
+   -------------------------------------------------------------------------- */
+.t-display {font-size:var(--fs-display); line-height:var(--lh-display); font-weight:var(--fw-display);}
+.t-title-1 {font-size:var(--fs-title-1); line-height:var(--lh-title-1); font-weight:var(--fw-title-1);}
+.t-title-2 {font-size:var(--fs-title-2); line-height:var(--lh-title-2); font-weight:var(--fw-title-2);}
+.t-title-3 {font-size:var(--fs-title-3); line-height:var(--lh-title-3); font-weight:var(--fw-title-3);}
+.t-headline{font-size:var(--fs-headline);line-height:var(--lh-headline);font-weight:var(--fw-headline);}
+.t-body    {font-size:var(--fs-body);    line-height:var(--lh-body);    font-weight:var(--fw-regular);}
+.t-callout {font-size:var(--fs-callout); line-height:var(--lh-callout); font-weight:var(--fw-callout);}
+.t-subhead {font-size:var(--fs-subhead); line-height:var(--lh-subhead); font-weight:var(--fw-regular);}
+.t-input   {font-size:var(--fs-input);   line-height:var(--lh-input);   font-weight:var(--fw-regular);}
+.t-footnote{font-size:var(--fs-footnote);line-height:var(--lh-footnote);font-weight:var(--fw-regular);}
+.t-caption {font-size:var(--fs-caption); line-height:var(--lh-caption); font-weight:var(--fw-regular);}
+.t-overline{font-size:var(--fs-overline);line-height:var(--lh-overline);font-weight:var(--fw-overline);
+            letter-spacing:var(--ls-overline);text-transform:uppercase;}
+
+.fw-regular {font-weight:var(--fw-regular);}
+.fw-semibold{font-weight:var(--fw-semibold);}
+.fw-bold    {font-weight:var(--fw-bold);}

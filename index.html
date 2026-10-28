@@ -1,0 +1,1390 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Nomni Theme Builder</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&family=Archivo+Black&family=Archivo:wght@400;600&family=Barlow:wght@400;500;600&family=DM+Sans:wght@400;500;700&family=Fraunces:wght@600;700&family=Nunito:wght@400;700;800&family=Oswald:wght@500;600;700&family=Playfair+Display:wght@600;700&family=Source+Sans+3:wght@400;600&family=Work+Sans:wght@400;600&display=swap">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+/* Layout: top bar · section rail · settings panel of soft grey cards · preview stage with phone and desktop frames.
+   Builder look follows the Nomni moodboard: white ground, grey cards, no borders, Seaweed pills, Mint selection.
+   Single light look by choice (the moodboard defines no dark palette). */
+:root{
+  color-scheme: light;
+  --white:#FFFFFF; --grey:#F3F4F4; --grey-2:#E7E9E8; --seaweed:#0E3727; --muted:#3F5248;
+  --green:#2AC864; --mint:#E2FFE6; --spinach:#076715; --cream:#FAF7E9; --line:#E3E5E4;
+  --bad:#A8231A; --bad-soft:#FCEBE9; --warn:#7A5300;
+  --ui:'Hanken Grotesk', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --mono: ui-monospace, SFMono-Regular, Menlo, monospace;
+  --float: 0 1px 2px rgba(14,55,39,.06), 0 12px 32px rgba(14,55,39,.10);
+}
+html,body{height:100%}
+[hidden]{display:none!important}
+body{margin:0;background:var(--grey-2);color:var(--seaweed);font-family:var(--ui);font-size:15px;line-height:1.45;overflow:hidden}
+/* browser window: fills the screen up to 1440px wide, floats centred beyond that */
+.win{height:100%;max-width:1440px;margin:0 auto;display:flex;flex-direction:column;background:var(--white)}
+.chrome{flex:none;height:46px;display:grid;grid-template-columns:1fr minmax(0,640px) 1fr;align-items:center;gap:16px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));background:#ECEDEC;box-shadow:inset 0 -1px 0 var(--grey-2)}
+.chrome-l{display:flex;align-items:center;gap:18px;min-width:0}
+.dots{display:flex;gap:8px}
+.dots i{width:12px;height:12px;border-radius:50%;background:#FF5F57}
+.dots i:nth-child(2){background:#FEBC2E}
+.dots i:nth-child(3){background:#28C840}
+.navb{display:flex;gap:10px;color:#8A928E}
+.navb svg{width:17px;height:17px}
+.addr{height:30px;border-radius:999px;background:var(--white);display:flex;align-items:center;justify-content:center;gap:7px;padding:0 14px;font-size:13.5px;font-weight:500;color:var(--seaweed);min-width:0}
+.addr svg{width:13px;height:13px;color:var(--muted);flex:none}
+.addr span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#app{flex:1;min-height:0}
+/* Prototype view switch: the builder as its own website, or inside the Nomni POS dashboard */
+.chrome-r{display:flex;justify-content:flex-end;gap:8px}
+.chrome .shell-seg{background:#E0E2E1;padding:2px;gap:2px;grid-auto-columns:auto}
+.chrome .shell-seg button{height:24px;font-size:12px;padding:0 10px}
+.nx-wrap{flex:1;min-height:0;display:flex;flex-direction:column}
+.nx{display:none}
+body.dash .nx-wrap{display:grid;grid-template-columns:216px minmax(0,1fr);grid-template-rows:42px minmax(0,1fr)}
+body.dash .nx{display:contents}
+body.dash #app{grid-column:2;grid-row:2;min-height:0}
+.nx-top{grid-column:1/3;grid-row:1;display:flex;align-items:stretch;background:#1d1f1e;color:#e8ece9;font-size:13px;min-width:0;overflow:hidden}
+.nx-logo{display:flex;align-items:center;gap:6px;width:216px;flex:none;padding-left:18px;font-size:20px;letter-spacing:-.02em}
+.nx-logo svg{width:22px;height:22px}
+.nx-logo b{font-weight:800;color:#fff}
+.nx-logo i{font-style:normal;color:#2ab24a;font-weight:500}
+.nx-burger{display:flex;align-items:center;padding:0 14px;color:#b9c1bc}
+.nx-burger svg{width:22px;height:22px;background:#3a3d3b;border-radius:4px;padding:3px}
+.nx-nav{display:flex;align-items:center;gap:6px;padding:0 12px;white-space:nowrap;border-left:1px solid #2c2f2d;color:#d4dad6}
+.nx-help{margin-left:auto;text-decoration:underline;border-left:0}
+.nx-pos{background:#2ab24a;color:#fff;border-radius:6px;margin:3px 4px;border-left:0}
+.nx-pos svg{width:15px;height:15px}
+.nx-av{display:flex;align-items:center;justify-content:center;width:30px;height:30px;margin:6px 14px;border-radius:50%;background:#6c4cf5;color:#fff;font-weight:700;font-size:12px;flex:none}
+.nx-side{grid-column:1;grid-row:2;background:#123d26;color:#d9e6dd;display:flex;flex-direction:column;overflow:auto;padding:12px 0 24px}
+.nx-h{color:#fff;font-weight:600;font-size:13.5px;letter-spacing:.02em;padding:6px 20px 12px}
+.nx-item{display:flex;align-items:center;gap:12px;padding:9px 20px;font-size:13.5px;color:#d3e2d8}
+.nx-item svg{width:17px;height:17px;flex:none;color:#e7efe9}
+.nx-item.on{background:#1c5233;color:#fff;font-weight:600;box-shadow:inset 3px 0 0 #2ab24a}
+body.dash .top .wordmark{display:none}
+@media (min-width: 1472px){
+  .win{height:calc(100% - 32px);margin:16px auto;border-radius:14px;overflow:hidden;box-shadow:var(--float)}
+}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--spinach);outline-offset:2px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+
+/* shared controls */
+.pill{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:44px;padding:0 20px;border:0;border-radius:999px;font-weight:700;font-size:15px;white-space:nowrap}
+.pill-dark{background:var(--seaweed);color:var(--white)}
+.pill-green{background:var(--green);color:var(--seaweed)}
+.pill-white{background:var(--white);color:var(--seaweed)}
+.pill-grey{background:var(--grey);color:var(--seaweed)}
+.pill-sm{height:34px;padding:0 14px;font-size:13.5px}
+.pill-lg{height:60px;font-size:18px;padding:0 28px}
+.pill[disabled]{opacity:.45;cursor:not-allowed}
+.rb{width:40px;height:40px;border:0;border-radius:999px;background:var(--grey);display:grid;place-items:center;color:var(--seaweed)}
+.rb svg{width:19px;height:19px}
+.rb[disabled]{opacity:.35;cursor:not-allowed}
+.seg{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);gap:4px;padding:4px;border-radius:999px;background:var(--white)}
+.seg.on-white{background:var(--grey)}
+.seg button{height:38px;border:0;border-radius:999px;background:transparent;color:var(--muted);font-weight:600;font-size:14px;padding:0 10px;white-space:nowrap}
+.seg button[aria-pressed="true"]{background:var(--mint);color:var(--seaweed);font-weight:700}
+.label{font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.eyebrow{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.muted{color:var(--muted)}
+
+/* ---------- onboarding ---------- */
+.ob{height:100%;overflow:auto;display:flex;flex-direction:column}
+.ob-top{display:flex;align-items:center;gap:14px;padding-block:18px;padding-left:max(24px,env(safe-area-inset-left,0px));padding-right:max(24px,env(safe-area-inset-right,0px))}
+.wordmark{font-size:24px;font-weight:800;letter-spacing:-.04em}
+.tag{padding:5px 12px;border-radius:999px;background:var(--mint);font-size:11.5px;font-weight:600;letter-spacing:.06em}
+.crumb{color:var(--muted);font-size:14px}
+.crumb b{color:var(--seaweed);font-weight:600}
+.ob-steps{list-style:none;margin:0 0 0 auto;padding:0;display:flex;gap:6px}
+.ob-steps li{padding:6px 12px;border-radius:999px;background:var(--grey);font-size:13px;font-weight:600;color:var(--muted)}
+.ob-steps li[aria-current="step"]{background:var(--seaweed);color:var(--white)}
+.ob-steps li.done{background:var(--mint);color:var(--seaweed)}
+.ob-body{flex:1;display:grid;grid-template-columns:minmax(0,520px) minmax(0,1fr);gap:40px;padding-block:8px 32px;padding-left:max(24px,env(safe-area-inset-left,0px));padding-right:max(24px,env(safe-area-inset-right,0px));max-width:1240px;width:100%;margin:0 auto;align-items:start}
+.ob-col{display:flex;flex-direction:column;gap:16px}
+.ob h1{margin:8px 0 0;font-size:44px;line-height:1.02;font-weight:700;letter-spacing:-.035em;text-wrap:balance}
+.ob .lede{margin:0;font-size:17px;color:var(--muted);max-width:46ch}
+.field{background:var(--grey);border-radius:24px;padding:14px 22px;display:flex;flex-direction:column;gap:4px}
+.field input{border:0;padding:0;outline:none;background:transparent;font-size:18px;font-weight:500;width:100%}
+.field:focus-within{box-shadow:inset 0 0 0 2px var(--spinach)}
+.choice{display:flex;align-items:center;gap:16px;background:var(--grey);border-radius:24px;padding:18px 22px;border:0;text-align:left;width:100%;cursor:pointer}
+.choice .ci{width:44px;height:44px;border-radius:14px;background:var(--white);display:grid;place-items:center;flex:none;overflow:hidden}
+.choice .ci.mint{background:var(--mint)}
+.choice .ci img{width:100%;height:100%;object-fit:contain}
+.choice .ci svg{width:22px;height:22px}
+.choice .ct{display:flex;flex-direction:column;gap:2px;flex:1;min-width:0}
+.choice .ct b{font-size:17px}
+.choice .ct span{font-size:14px;color:var(--muted)}
+.choice .chev{width:20px;height:20px;color:var(--muted);flex:none}
+.card{background:var(--grey);border-radius:28px;padding:22px}
+.swrow{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.sw{width:30px;height:30px;border-radius:999px;border:0;padding:0;box-shadow:inset 0 0 0 1px rgba(14,55,39,.12)}
+.sw[aria-pressed="true"]{box-shadow:0 0 0 3px var(--white),0 0 0 5px var(--seaweed)}
+.field,.choice,.card,.grp{box-sizing:border-box}
+.k{font-weight:600;font-size:14px;margin-bottom:-4px}
+.pair{display:grid;grid-template-columns:auto 1fr auto;gap:12px 14px;align-items:center}
+.pair .k{font-weight:600}
+.err{color:var(--bad);font-size:14px;margin:0}
+.ob-cta{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-top:4px}
+.ob-stage{position:sticky;top:8px;background:var(--mint);border-radius:28px;padding:28px 24px 0;display:flex;justify-content:center;gap:28px;overflow:hidden;min-height:540px;align-items:flex-start}
+.ob-stage .cap{position:absolute;left:24px;top:18px}
+.ob-stage .scaler{margin-top:22px}
+.preset-desc{display:flex;flex-direction:column;gap:6px}
+.preset-desc b{font-size:22px;letter-spacing:-.01em;line-height:1.2}
+.ob-mini{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.ob-mini .card{display:flex;flex-direction:column;gap:6px;padding:18px;border-radius:24px}
+.ob-mini b{font-size:16px}
+.ob-mini span{font-size:14px;color:var(--muted)}
+
+/* ---------- editor ---------- */
+.ed{height:100%;display:grid;grid-template-rows:auto minmax(0,1fr)}
+.top{display:flex;align-items:center;gap:16px;padding-block:12px;padding-left:max(20px,env(safe-area-inset-left,0px));padding-right:max(20px,env(safe-area-inset-right,0px));background:var(--white);box-shadow:0 1px 0 var(--grey-2);position:relative;z-index:5;flex-wrap:wrap}
+.top-l{display:flex;align-items:center;gap:14px;min-width:0}
+.top-c{margin:0 auto}
+.top-c .seg{background:var(--grey)}
+.top-r{display:flex;align-items:center;gap:8px}
+.loc-chip{display:inline-flex;align-items:center;gap:6px;height:30px;padding:0 12px 0 10px;border-radius:999px;background:var(--grey);font-size:13px;color:var(--muted);white-space:nowrap}
+.loc-chip svg{width:15px;height:15px;color:var(--spinach)}
+.loc-chip b{color:var(--seaweed);font-weight:700}
+.status{display:inline-flex;align-items:center;gap:8px;height:34px;padding:0 14px;border-radius:999px;font-size:13.5px;font-weight:600;white-space:nowrap}
+.status i{width:8px;height:8px;border-radius:50%;background:currentColor}
+.status.live{background:var(--mint);color:var(--spinach)}
+.status.draft{background:var(--cream);color:var(--warn)}
+.saved{font-size:12.5px;color:var(--muted);white-space:nowrap}
+.main{display:grid;grid-template-columns:96px 360px minmax(0,1fr);min-height:0}
+.rail{display:flex;flex-direction:column;gap:4px;padding:14px 10px;overflow:auto;background:var(--white)}
+.rail-b{position:relative;display:flex;flex-direction:column;align-items:center;gap:4px;padding:10px 4px;border:0;border-radius:20px;background:transparent;font-size:11.5px;font-weight:600;color:var(--muted);text-align:center;line-height:1.2}
+.rail-b svg{width:21px;height:21px}
+.rail-b[aria-current="true"]{background:var(--mint);color:var(--seaweed)}
+.rail-b:hover{color:var(--seaweed)}
+.rail-n{position:absolute;top:6px;right:14px;min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:var(--bad);color:#fff;font-size:11px;font-style:normal;font-weight:700;display:grid;place-items:center}
+.rail-end{margin-top:auto}
+.rail-b[disabled]{opacity:.45;cursor:default}
+.step-n{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;background:var(--grey);color:var(--seaweed);font-weight:700;font-size:13px}
+.rail-b[aria-current="true"] .step-n{background:var(--seaweed);color:var(--white)}
+.step-n.done{background:var(--green);color:var(--seaweed)}
+.panel{overflow:auto;padding:16px 16px 40px;display:flex;flex-direction:column;gap:12px;background:var(--white)}
+.panel h2{margin:4px 6px 0;font-size:26px;font-weight:600;letter-spacing:-.01em}
+.panel .intro{margin:0 6px 4px;color:var(--muted);font-size:14.5px}
+.grp{background:var(--grey);border-radius:24px;padding:16px 18px;display:flex;flex-direction:column;gap:12px}
+.grp > .eyebrow{margin-bottom:-2px}
+.row{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:36px}
+.row > label,.row > span.rl{font-weight:600;font-size:14.5px;display:flex;flex-direction:column}
+.row small{font-weight:400;color:var(--muted);font-size:12.5px}
+.divide > * + *{border-top:2px solid var(--white);padding-top:12px}
+.cpick{display:flex;align-items:center;gap:8px;background:var(--white);border-radius:999px;padding:4px 12px 4px 4px}
+.cpick input[type=color]{width:30px;height:30px;border:0;border-radius:50%;padding:0;background:none;cursor:pointer}
+.cpick input[type=color]::-webkit-color-swatch-wrapper{padding:0}
+.cpick input[type=color]::-webkit-color-swatch{border:0;border-radius:50%;box-shadow:inset 0 0 0 1px rgba(14,55,39,.15)}
+.cpick input[type=color]::-moz-color-swatch{border:0;border-radius:50%}
+.hex{width:76px;border:0;background:transparent;font-family:var(--mono);font-size:13px;text-transform:uppercase;outline:none}
+.tf{background:var(--white);border-radius:16px;padding:10px 14px;display:flex;flex-direction:column;gap:2px}
+.tf input{border:0;outline:none;background:transparent;font-size:15.5px;font-weight:500;width:100%;padding:0}
+.tf:focus-within{box-shadow:inset 0 0 0 2px var(--spinach)}
+.tog{position:relative;display:inline-block;width:52px;height:30px;flex:none}
+.tog input{position:absolute;inset:0;opacity:0;margin:0;cursor:pointer;z-index:1}
+.tog span{position:absolute;inset:0;border-radius:999px;background:#C9CDCB;transition:background .15s}
+.tog span::after{content:"";position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:50%;background:#fff;transition:transform .15s;box-shadow:0 1px 2px rgba(0,0,0,.15)}
+.tog input:checked + span{background:var(--spinach)}
+.tog input:checked + span::after{transform:translateX(22px)}
+.tog input:focus-visible + span{outline:2px solid var(--spinach);outline-offset:2px}
+.range{display:flex;align-items:center;gap:12px}
+.range input{flex:1;accent-color:var(--spinach)}
+.range output{min-width:52px;text-align:right;font-weight:700;color:var(--spinach);font-variant-numeric:tabular-nums}
+#checks{display:flex;flex-direction:column;gap:12px}
+.sub{display:flex;flex-direction:column;gap:8px}
+.shades{display:flex;flex-wrap:wrap;gap:6px}
+.shade{display:inline-flex;align-items:center;gap:6px;background:var(--white);border-radius:999px;padding:4px 10px 4px 4px;font-size:12.5px;color:var(--muted)}
+.shade i{width:18px;height:18px;border-radius:50%;box-shadow:inset 0 0 0 1px rgba(14,55,39,.12)}
+.ck-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+.ck{display:flex;align-items:center;gap:12px;background:var(--white);border-radius:16px;padding:8px 10px 8px 8px}
+.ck-sw{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;font-weight:800;font-size:15px;flex:none;box-shadow:inset 0 0 0 1px rgba(14,55,39,.08)}
+.ck-l{flex:1;min-width:0;font-weight:600;font-size:14px;display:flex;flex-direction:column}
+.ck-l small{font-weight:500;color:var(--muted);font-size:12.5px;font-variant-numeric:tabular-nums}
+.ck-pass{font-size:12.5px;font-weight:700;color:var(--spinach);padding:0 8px}
+.ck.no .ck-l small{color:var(--bad)}
+.sum{display:flex;align-items:center;gap:10px;font-weight:600;font-size:14px}
+.sum i{width:22px;height:22px;border-radius:50%;display:grid;place-items:center;font-style:normal;font-size:12px;color:#fff;background:var(--spinach)}
+.sum.no i{background:var(--bad)}
+details.adv summary{cursor:pointer;font-weight:600;font-size:14px;list-style:none;display:flex;justify-content:space-between}
+details.adv summary::-webkit-details-marker{display:none}
+details.adv summary::after{content:"Show";color:var(--spinach);font-weight:700}
+details.adv[open] summary::after{content:"Hide"}
+.classic{display:grid;grid-template-columns:1fr auto;gap:6px 12px;margin-top:12px;font-size:13.5px}
+.classic span:nth-child(even){display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:12.5px}
+.classic i{width:16px;height:16px;border-radius:50%;box-shadow:inset 0 0 0 1px rgba(14,55,39,.15)}
+.pairs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.pairb{border:0;background:var(--white);border-radius:18px;padding:12px 14px;text-align:left;display:flex;flex-direction:column;gap:2px;min-width:0}
+.pairb[aria-pressed="true"]{background:var(--mint);box-shadow:inset 0 0 0 2px var(--seaweed)}
+.pairb .ph{font-size:19px;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pairb .pb{font-size:12.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pairb .pn{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-top:4px}
+.slot{display:flex;align-items:center;gap:12px;background:var(--white);border-radius:16px;padding:10px 12px}
+.slot .sn{flex:1;min-width:0;display:flex;flex-direction:column}
+.slot .sn b{font-size:14px}
+.slot .sn span{font-size:12.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.slot .sa{font-size:22px;width:44px;height:44px;border-radius:12px;background:var(--grey);display:grid;place-items:center;flex:none}
+.filebtn{position:relative;overflow:hidden}
+.filebtn input{position:absolute;inset:0;opacity:0;cursor:pointer}
+.chk{display:flex;gap:10px;align-items:flex-start;font-size:14px;font-weight:500}
+.chk input{width:20px;height:20px;accent-color:var(--seaweed);margin:1px 0 0;flex:none}
+.note{font-size:13px;color:var(--muted);margin:0}
+.brandfont[aria-pressed="true"]{background:var(--mint);box-shadow:inset 0 0 0 2px var(--seaweed)}
+.choice.brandfont{background:var(--white)}
+.presets{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.preset{border:0;background:var(--white);border-radius:22px;padding:12px 12px 14px;display:flex;flex-direction:column;gap:10px;text-align:left}
+.preset[aria-pressed="true"]{background:var(--mint);box-shadow:inset 0 0 0 2px var(--seaweed)}
+.preset .pv-mini{border-radius:14px;overflow:hidden;background:var(--grey)}
+.preset b{font-size:15px}
+.preset-type{display:grid;place-items:center;height:72px;background:var(--grey);font-size:22px;line-height:1}
+.preset span{font-size:12.5px;color:var(--muted)}
+.logo-row{display:flex;align-items:center;gap:14px}
+.logo-row img{width:64px;height:64px;object-fit:contain;border-radius:16px;background:var(--white)}
+.found{display:flex;flex-direction:column;gap:8px}
+.found-i{display:flex;align-items:center;gap:10px;background:var(--white);border-radius:14px;padding:6px 8px 6px 6px}
+.found-i i{width:28px;height:28px;border-radius:9px;flex:none}
+.found-i code{flex:1;font-family:var(--mono);font-size:12.5px}
+.qrbox{background:var(--white);border-radius:18px;padding:12px;display:grid;place-items:center}
+.qrbox img,.qrbox canvas{display:block;width:132px;height:132px}
+.qrgrid{display:grid;grid-template-columns:auto 1fr;gap:14px;align-items:center}
+.linkrow{display:flex;gap:8px;align-items:center;background:var(--white);border-radius:999px;padding:4px 4px 4px 16px}
+.linkrow input{flex:1;min-width:0;border:0;outline:none;background:transparent;font-size:14px;font-weight:500;color:var(--spinach)}
+
+/* stage */
+.stage{background:var(--grey);overflow:auto;display:flex;flex-direction:column;min-width:0}
+.stage-bar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:16px 24px 0}
+.stage-bar .seg{background:var(--white)}
+.stage-note{font-size:13px;color:var(--muted);margin-left:auto}
+.frames{display:flex;gap:32px;align-items:flex-start;justify-content:center;padding:24px 24px 48px}
+.fr{display:flex;flex-direction:column;gap:10px;min-width:0}
+.fr-m{flex:0 1 390px}
+.fr-d{flex:1 1 560px;max-width:1280px}
+.frames[data-dev="both"]{gap:24px}
+.frames[data-dev="both"] .fr-m{flex-basis:320px}
+.fr-label{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding-left:6px}
+.scaler{position:relative;width:100%;overflow:visible}
+.scaler > *{transform-origin:top left;position:absolute;top:0;left:0}
+.phone{width:390px;height:780px;border-radius:44px;background:#0d0f0e;padding:10px;box-shadow:var(--float)}
+.ph-in{width:100%;height:100%;border-radius:35px;overflow:hidden;display:flex;flex-direction:column}
+.ph-status{height:34px;flex:none;display:flex;align-items:center;justify-content:space-between;padding:0 26px;font-size:13px;font-weight:700;font-family:var(--ui)}
+.ph-status span:last-child{width:22px;height:10px;border-radius:3px;background:currentColor;opacity:.85}
+.ph-screen{flex:1;min-height:0}
+.desk{width:1280px;height:800px;border-radius:16px;overflow:hidden;background:#fff;box-shadow:var(--float);display:flex;flex-direction:column}
+.dk-bar{height:40px;flex:none;background:#EDEEED;display:flex;align-items:center;gap:8px;padding:0 16px}
+.dk-bar i{width:12px;height:12px;border-radius:50%;background:#D3D6D4}
+.dk-url{margin-left:16px;background:#fff;border-radius:999px;padding:4px 16px;font-size:13px;color:var(--muted);font-family:var(--ui)}
+.dk-screen{flex:1;min-height:0}
+.rf{display:block;border:0;background:transparent}
+.rf-m{width:410px;height:864px}
+.rf-d{width:1280px;height:800px;flex:none}
+.desk.real{height:840px}
+.frames.clickable .st [data-sec]:hover{outline:2px dashed rgba(42,200,100,.9);outline-offset:-2px;cursor:pointer}
+
+/* modal + toast */
+.modal-bg{position:fixed;inset:0;background:rgba(14,55,39,.35);display:grid;place-items:center;z-index:50;padding:16px}
+.modal{background:var(--white);border-radius:28px;width:min(560px,100%);max-height:calc(100% - 32px);overflow:auto;padding:26px;display:flex;flex-direction:column;gap:14px;box-shadow:var(--float)}
+.modal h2{margin:0;font-size:26px;font-weight:600;letter-spacing:-.01em}
+.modal p{margin:0}
+.modal-x{align-self:flex-end;margin:-8px -8px -40px 0}
+.diff{list-style:none;margin:0;padding:6px 18px;background:var(--grey);border-radius:24px;display:flex;flex-direction:column}
+.diff li{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:11px 0;font-size:14.5px}
+.diff li + li{border-top:2px solid var(--white)}
+.diff .dv{display:flex;align-items:center;gap:6px;font-weight:600;color:var(--spinach);text-align:right;font-size:13.5px}
+.diff .dv i{width:14px;height:14px;border-radius:50%;box-shadow:inset 0 0 0 1px rgba(14,55,39,.15)}
+.diff .dv s{color:var(--muted);font-weight:500;text-decoration:none}
+.warnbox{background:var(--cream);border-radius:20px;padding:14px 16px;font-size:14px;display:flex;flex-direction:column;gap:10px}
+.warnbox b{color:var(--warn)}
+.mrow{display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap;margin-top:4px}
+.toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--seaweed);color:#fff;padding:12px 20px;border-radius:999px;font-weight:600;z-index:60;box-shadow:var(--float);display:flex;gap:10px;align-items:center}
+.toast i{width:20px;height:20px;border-radius:50%;background:var(--green);color:var(--seaweed);display:grid;place-items:center;font-style:normal;font-size:12px;font-weight:800}
+
+/* share preview mode */
+.pvm{height:100%;display:grid;grid-template-rows:auto minmax(0,1fr)}
+.pv-bar{display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding-block:12px;padding-left:max(20px,env(safe-area-inset-left,0px));padding-right:max(20px,env(safe-area-inset-right,0px));background:var(--seaweed);color:#fff}
+.pv-tag{background:var(--green);color:var(--seaweed);font-weight:800;font-size:12px;letter-spacing:.06em;text-transform:uppercase;padding:6px 12px;border-radius:999px}
+.pv-msg{font-size:14px;opacity:.9}
+.pv-r{margin-left:auto;display:flex;gap:8px;align-items:center}
+.pv-r .seg{background:rgba(255,255,255,.12)}
+.pv-r .seg button{color:#cfe0d6}
+.pv-r .seg button[aria-pressed="true"]{background:var(--mint);color:var(--seaweed)}
+
+@media (max-width: 980px){
+  body{overflow:auto}
+  .win{height:auto;min-height:100%}
+  #app{flex:1 0 auto}
+  .chrome{grid-template-columns:auto minmax(0,1fr)}
+  .navb{display:none}
+  .chrome{grid-template-columns:auto minmax(0,1fr) auto}
+  .dots{display:none}
+  body.dash .nx-wrap{grid-template-columns:minmax(0,1fr)}
+  body.dash .nx-side{display:none}
+  body.dash #app{grid-column:1}
+  .nx-nav:not(.nx-pos):not(.nx-help){display:none}
+  .nx-logo{width:auto;padding-right:8px}
+  .ed{height:auto}
+  .main{grid-template-columns:1fr}
+  .rail{flex-direction:row;overflow-x:auto;padding:8px 12px;position:sticky;top:0;z-index:4;box-shadow:0 1px 0 var(--grey-2)}
+  .rail-b{flex:none;min-width:78px}
+  .rail-end{margin-top:0}
+  .panel{overflow:visible;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+  .stage{overflow:visible}
+  .top-c{order:3;margin:0;width:100%}
+  .top-r{margin-left:auto}
+  .ob-body{grid-template-columns:1fr}
+  .ob-stage{position:relative;top:0;min-height:0}
+  .ob h1{font-size:34px}
+  .ob-steps{display:none}
+  .frames{padding:16px}
+  .stage-bar{padding:16px 16px 0}
+  .pvm{height:auto}
+}
+@media (max-width: 520px){
+  .top-l .crumb{display:none}
+  .saved{display:none}
+  .pairs,.presets{grid-template-columns:1fr 1fr}
+  .stage-bar .seg{width:100%;overflow-x:auto}
+}
+@media (prefers-reduced-motion: reduce){ *{transition:none!important} }
+
+/* ---------- storefront (merchant theme, scoped) ---------- */
+.st{position:relative;height:100%;overflow:hidden;background:var(--bg);color:var(--tx);font-family:var(--bf);font-size:14px;line-height:1.4;-webkit-font-smoothing:antialiased;text-align:left}
+.st *{box-sizing:border-box}
+.st-scroll{height:100%;overflow:auto;scrollbar-width:none}
+.st-scroll::-webkit-scrollbar{display:none}
+.st .s-h{font-family:var(--hf);text-transform:var(--htt);letter-spacing:var(--hls);font-weight:var(--hw);margin:0;line-height:1.15}
+.s-hd{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 14px;background:var(--bg);border-bottom:1px solid var(--ln);position:sticky;top:0;z-index:3}
+.s-hd.is-brand{background:var(--b);color:var(--onb);border-color:transparent}
+.s-hd-l,.s-hd-r{display:flex;align-items:center;gap:8px;min-width:0}
+.s-logo{width:36px;height:36px;object-fit:contain;border-radius:8px}
+.s-name{font-family:var(--hf);font-weight:var(--hw);text-transform:var(--htt);letter-spacing:var(--hls);font-size:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.s-ico{width:36px;height:36px;display:grid;place-items:center;border-radius:999px;position:relative;flex:none}
+.s-ico svg{width:21px;height:21px}
+.s-dot{position:absolute;top:1px;right:-1px;min-width:17px;height:17px;border-radius:9px;background:var(--a);color:var(--ona);font-size:10px;font-weight:700;display:grid;place-items:center;padding:0 4px;font-style:normal;font-family:var(--bf)}
+.s-nav{display:flex;gap:28px;font-weight:600;font-size:15px}
+.s-signin{font-weight:600;font-size:14px;padding:8px 16px;border-radius:var(--btnr);border:1.5px solid currentColor}
+.s-ban{position:relative;margin:12px 14px 0;border-radius:var(--r);overflow:hidden;min-height:156px;display:flex;align-items:flex-end;background:var(--tint)}
+.s-ban img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.s-ban.photo::after{content:"";position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.62),rgba(0,0,0,0) 70%)}
+.s-ban.colour{background:var(--b);color:var(--onb)}
+.s-ban-txt{position:relative;z-index:1;padding:16px;display:flex;flex-direction:column;gap:8px;align-items:flex-start}
+.s-ban.photo .s-ban-txt{color:#fff}
+.s-ban h1{font-size:23px}
+.s-promo{background:var(--pm);color:var(--onpm);font-size:12px;font-weight:700;padding:5px 11px;border-radius:var(--btnr)}
+.s-setup{display:flex;gap:8px;padding:12px 14px 0;overflow-x:auto;scrollbar-width:none}
+.s-chip{flex:none;display:inline-flex;align-items:center;gap:6px;padding:8px 12px;border:1px solid var(--ln);background:var(--sf);color:var(--tx);border-radius:var(--btnr);font-weight:600;font-size:13px}
+.s-chip svg{width:15px;height:15px;color:var(--b)}
+.s-chip svg:last-child{color:var(--mut)}
+.s-chip-w{width:100%;justify-content:flex-start}
+.s-loyal{margin:12px 14px 0;display:flex;align-items:center;gap:10px;padding:11px 14px;background:var(--tint);border-radius:var(--r);font-size:13px}
+.s-loyal b{color:var(--b);font-weight:700}
+.s-loyal-v{margin-left:auto;font-weight:700;color:var(--b)}
+.s-tabs{display:flex;gap:8px;padding:14px 14px 2px;overflow-x:auto;scrollbar-width:none}
+.s-tabs.pill .s-tab{padding:7px 14px;border:1px solid var(--ln);border-radius:var(--btnr);font-weight:600;font-size:13px;white-space:nowrap;background:var(--sf)}
+.s-tabs.pill .s-tab.on{background:var(--b);color:var(--onb);border-color:var(--b)}
+.s-tabs.underline{gap:20px;border-bottom:1px solid var(--ln);margin:0 14px;padding:12px 0 0}
+.s-tabs.underline .s-tab{padding:4px 0 10px;font-weight:600;font-size:14px;color:var(--mut);border-bottom:2px solid transparent;white-space:nowrap}
+.s-tabs.underline .s-tab.on{color:var(--b);border-color:var(--b)}
+.s-sec{padding:16px 14px 4px}
+.s-sech{font-size:19px;margin-bottom:10px;color:var(--tx)}
+.s-items{display:grid;gap:10px}
+.s-items.tile{grid-template-columns:repeat(2,minmax(0,1fr))}
+.s-card{background:var(--sf);border-radius:var(--r)}
+.st[data-card="border"] .s-card{box-shadow:inset 0 0 0 1px var(--ln)}
+.st[data-card="shadow"] .s-card{box-shadow:0 1px 2px rgba(0,0,0,.06),0 6px 18px rgba(0,0,0,.08)}
+.s-item{position:relative;display:grid;gap:12px;padding:10px;overflow:hidden;align-items:start}
+.s-items.list .s-item{grid-template-columns:88px minmax(0,1fr)}
+.s-items.list .s-item.img-right{grid-template-columns:minmax(0,1fr) 88px}
+.s-items.list .s-item.img-right .s-img{order:2}
+.s-items.list .s-item.img-bleed{padding:0;grid-template-columns:104px minmax(0,1fr);align-items:stretch}
+.s-items.list .s-item.img-bleed .s-item-b{padding:10px 10px 10px 0}
+.s-items.list .s-item.img-bleed .s-img{border-radius:0;aspect-ratio:auto;height:100%;min-height:104px}
+.s-item.no-img{grid-template-columns:minmax(0,1fr)!important}
+.s-img{aspect-ratio:1;border-radius:calc(var(--r) * .7);overflow:hidden;background:var(--tint)}
+.s-img svg{width:100%;height:100%;display:block}
+.s-items.tile .s-item{grid-template-columns:minmax(0,1fr);padding:8px;gap:8px}
+.s-items.tile .s-img{aspect-ratio:4/3}
+.s-items.tile .s-item.img-bleed{padding:0}
+.s-items.tile .s-item.img-bleed .s-img{border-radius:0}
+.s-items.tile .s-item.img-bleed .s-item-b{padding:0 10px 12px}
+.s-item-b{display:flex;flex-direction:column;gap:3px;min-width:0;padding-bottom:2px}
+.s-badge{align-self:flex-start;background:var(--a);color:var(--ona);padding:2px 8px;border-radius:var(--btnr);font-size:10.5px;font-weight:700;letter-spacing:.03em;text-transform:uppercase}
+.s-iname{font-size:15px;color:var(--b)}
+.s-desc{margin:0;color:var(--mut);font-size:12.5px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.s-meta{display:flex;gap:8px;align-items:baseline;flex-wrap:wrap;padding-right:34px}
+.s-en{color:var(--nu);font-size:12px;font-weight:600}
+.s-pr{color:var(--pr);font-weight:700;font-size:15px}
+.s-pr small{font-weight:500;font-size:11px;color:var(--mut)}
+.s-add{position:absolute;right:10px;bottom:10px;width:30px;height:30px;border-radius:var(--btnr);background:var(--b);color:var(--onb);display:grid;place-items:center}
+.s-add svg{width:16px;height:16px}
+.s-btn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:14px 18px;border:0;border-radius:var(--btnr);font-family:var(--bf);font-weight:700;font-size:15px}
+.s-btn-p{background:var(--b);color:var(--onb)}
+.s-btn[disabled]{opacity:.5}
+.s-cartbar{position:absolute;left:0;right:0;bottom:0;padding:12px 14px 16px;background:linear-gradient(to top,var(--bg) 72%,transparent);z-index:4}
+.s-cartbar .s-btn{justify-content:space-between}
+.s-spacer{height:96px}
+.st[data-desktop="1"] .s-hd{padding:14px 40px}
+.st[data-desktop="1"] .s-logo{width:42px;height:42px}
+.st[data-desktop="1"] .s-name{font-size:19px}
+.s-body{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:32px;padding:0 40px 48px;align-items:start}
+.st[data-desktop="1"] .s-ban{margin:24px 0 0;min-height:250px}
+.st[data-desktop="1"] .s-ban h1{font-size:36px}
+.st[data-desktop="1"] .s-ban-txt{padding:28px}
+.st[data-desktop="1"] .s-setup{padding:16px 0 0}
+.st[data-desktop="1"] .s-loyal{margin:16px 0 0}
+.st[data-desktop="1"] .s-tabs.pill{padding:18px 0 2px}
+.st[data-desktop="1"] .s-tabs.underline{margin:0}
+.st[data-desktop="1"] .s-sec{padding:22px 0 4px}
+.st[data-desktop="1"] .s-items.list{grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.st[data-desktop="1"] .s-items.tile{grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.s-aside{position:sticky;top:96px;margin-top:24px;padding:20px;display:flex;flex-direction:column;gap:14px}
+.s-aside.is-focus{outline:3px solid var(--a);outline-offset:3px}
+.s-asideh{font-size:20px}
+.s-lines{display:flex;flex-direction:column;gap:12px}
+.s-line{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:10px;align-items:start;font-size:13.5px}
+.s-qty{min-width:24px;height:24px;border:1px solid var(--ln);border-radius:6px;display:grid;place-items:center;font-weight:700;font-size:12px}
+.s-line small{display:block;color:var(--mut);font-size:12px}
+.s-tot{display:flex;justify-content:space-between;font-weight:700;padding-top:12px;border-top:1px solid var(--ln)}
+.s-dim{position:absolute;inset:0;background:rgba(0,0,0,.42);z-index:8}
+.s-sheet{position:absolute;left:0;right:0;bottom:0;max-height:90%;overflow:auto;background:var(--bg);border-radius:calc(var(--r) + 10px) calc(var(--r) + 10px) 0 0;z-index:9;scrollbar-width:none}
+.st[data-desktop="1"] .s-sheet{left:50%;top:50%;bottom:auto;transform:translate(-50%,-50%);width:560px;max-height:86%;border-radius:calc(var(--r) + 8px)}
+.s-grab{width:40px;height:4px;border-radius:2px;background:var(--ln);margin:8px auto 0}
+.s-sheet-hero{aspect-ratio:16/9;overflow:hidden;background:var(--tint)}
+.s-sheet-hero svg{width:100%;height:100%;display:block}
+.s-sheet-b{padding:16px;display:flex;flex-direction:column;gap:16px}
+.s-sheet-t{font-size:22px}
+.s-desc-full{-webkit-line-clamp:unset;margin-top:4px}
+.s-meta-row{display:flex;gap:10px;align-items:baseline;margin-top:6px}
+.s-grp{display:flex;flex-direction:column;gap:8px}
+.s-opt-h{display:flex;justify-content:space-between;align-items:baseline}
+.s-grp-t{font-size:16px}
+.s-req{font-size:11px;font-weight:700;padding:2px 8px;border-radius:999px;background:var(--tint);color:var(--b)}
+.s-mut{font-size:12.5px;color:var(--mut)}
+.s-opt{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:var(--r);background:var(--sf);box-shadow:inset 0 0 0 1px var(--ln)}
+.s-opt.on{box-shadow:inset 0 0 0 2px var(--b)}
+.s-opt > span:nth-child(2){display:flex;flex-direction:column;font-weight:600}
+.s-opt small{font-weight:400;color:var(--mut);font-size:12px}
+.s-radio,.s-check{width:18px;height:18px;border-radius:50%;box-shadow:inset 0 0 0 2px var(--ln);flex:none}
+.s-check{border-radius:4px}
+.s-opt.on .s-radio{box-shadow:inset 0 0 0 5px var(--b)}
+.s-opt.on .s-check{background:var(--b);box-shadow:none}
+.s-x{margin-left:auto;color:var(--mut);font-size:13px}
+.s-ico-s{color:var(--b);display:grid}
+.s-ico-s svg{width:18px;height:18px}
+.s-slots{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.s-slot{padding:10px;text-align:center;border-radius:var(--r);background:var(--sf);box-shadow:inset 0 0 0 1px var(--ln);font-weight:600;font-size:13px}
+.s-slot.on{background:var(--b);color:var(--onb);box-shadow:none}
+.s-sheet-foot{display:flex;gap:12px;align-items:center;padding:0 16px 16px}
+.s-step{display:flex;align-items:center;gap:12px;font-weight:700}
+.s-step span{width:34px;height:34px;border-radius:var(--btnr);box-shadow:inset 0 0 0 1px var(--ln);display:grid;place-items:center}
+.s-co{padding:14px;display:flex;flex-direction:column;gap:14px}
+.st[data-desktop="1"] .s-co{max-width:1040px;margin:0 auto;display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:24px;padding:32px 40px;align-items:start}
+.s-co-main{display:flex;flex-direction:column;gap:14px}
+.s-co-hd{display:flex;align-items:center;gap:8px}
+.s-co-t{font-size:24px}
+.s-box{padding:16px;display:flex;flex-direction:column;gap:10px}
+.s-p{margin:0;color:var(--mut);font-size:13.5px}
+.s-field{display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--mut)}
+.s-field div{box-shadow:inset 0 0 0 1px var(--ln);border-radius:calc(var(--r) * .7);padding:10px 12px;color:var(--tx);font-size:14px;background:var(--bg)}
+</style>
+</head>
+<body>
+<div class="win">
+  <div class="chrome">
+    <div class="chrome-l"><span class="dots" aria-hidden="true"><i></i><i></i><i></i></span><span class="navb" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 1 1-2.3-5.7"/><path d="M20 4v5h-5"/></svg></span></div>
+    <div class="addr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg><span id="addrText">onlineorderingthemebuilder.com</span></div>
+    <div class="chrome-r"><div class="seg shell-seg" role="group" aria-label="Merchant"><button type="button" data-act="persona" data-id="new" aria-pressed="true">New merchant</button><button type="button" data-act="persona" data-id="returning" aria-pressed="false">Returning</button></div><div class="seg shell-seg" role="group" aria-label="View"><button type="button" data-act="shell" data-id="site" aria-pressed="true">Website</button><button type="button" data-act="shell" data-id="dash" aria-pressed="false">In Nomni dashboard</button></div></div>
+  </div>
+  <div class="nx-wrap">
+  <div class="nx" aria-hidden="true">
+    <div class="nx-top"><span class="nx-logo"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21c-4.4 0-7-3-7-6.6C5 10 8.6 8 12 8s7 2 7 6.4C19 18 16.4 21 12 21z" fill="#2ab24a"/><path d="M12 8c0-2.5 1.2-4.4 3.4-5.2" stroke="#2ab24a" stroke-width="2" fill="none" stroke-linecap="round"/></svg><b>nomni</b> <i>POS</i></span><span class="nx-burger"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></span><span class="nx-nav nx-help">Need help?</span><span class="nx-nav nx-pos"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 4h2l2.4 11h10.2L20 7H6.2"/><circle cx="9" cy="20" r="1.5"/><circle cx="17" cy="20" r="1.5"/></svg>POS</span><span class="nx-nav">BI</span><span class="nx-nav">Table Ordering/Kiosk</span><span class="nx-nav">Delivery</span><span class="nx-nav">Loyalty Marketing</span><span class="nx-nav">Stock</span><span class="nx-nav">Configuration</span><span class="nx-nav">Add-Ons</span><span class="nx-av">MP</span></div>
+    <nav class="nx-side"><span class="nx-h">POINT OF SALE</span><span class="nx-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>Dashboard</span><span class="nx-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2v20M17 6H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>Sales</span><span class="nx-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2v20M17 6H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>Purchases</span><span class="nx-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 4h2l2.4 11h10.2L20 7H6.2"/><circle cx="9" cy="20" r="1.5"/><circle cx="17" cy="20" r="1.5"/></svg>Products</span><span class="nx-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="3" width="14" height="18" rx="2"/></svg>Menus</span><span class="nx-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><ellipse cx="10" cy="8" rx="7" ry="3.5"/><path d="M3 8v4c0 1.9 3.1 3.5 7 3.5"/><path d="M14 13.5c3.9 0 7 1.6 7 3.5s-3.1 3.5-7 3.5-7-1.6-7-3.5"/></svg>Payment</span><span class="nx-item on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 4h2l2.4 11h10.2L20 7H6.2"/><circle cx="9" cy="20" r="1.5"/><circle cx="17" cy="20" r="1.5"/></svg>Online Ordering</span><span class="nx-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><ellipse cx="10" cy="8" rx="7" ry="3.5"/><path d="M3 8v4c0 1.9 3.1 3.5 7 3.5"/><path d="M14 13.5c3.9 0 7 1.6 7 3.5s-3.1 3.5-7 3.5-7-1.6-7-3.5"/></svg>Pay At Table</span><span class="nx-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>Reports</span><span class="nx-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg>Stock Management</span><span class="nx-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3v18M12 3v18M18 3v18"/><rect x="4" y="13" width="4" height="3" rx="1"/><rect x="10" y="6" width="4" height="3" rx="1"/><rect x="16" y="15" width="4" height="3" rx="1"/></svg>POS Settings</span><span class="nx-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9V3h12v6"/><rect x="3" y="9" width="18" height="8" rx="2"/><path d="M7 14h10v7H7z"/></svg>Print Settings</span><span class="nx-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>Users</span><span class="nx-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>Appointment</span><span class="nx-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>Reservations</span><span class="nx-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M2 20c0-3.5 3.1-5.5 7-5.5s7 2 7 5.5"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7M18 14.5c2.4.6 4 2.4 4 5.5"/></svg>Customers</span><span class="nx-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5h16v11H8l-4 4z"/></svg>Feedback</span><span class="nx-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="6" r="2.5"/><circle cx="18" cy="18" r="2.5"/><path d="M8.2 11l7.6-4M8.2 13l7.6 4"/></svg>Sites</span></nav>
+  </div>
+  <div id="app"></div>
+  </div>
+</div>
+<div id="modal"></div>
+<div id="toast" class="toast" hidden></div>
+
+<script>
+'use strict';
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const esc = s => String(s ?? '').replace(/[&<>"']/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]));
+const clone = o => JSON.parse(JSON.stringify(o));
+const app = $('#app');
+
+/* ---------- colour maths ---------- */
+const hex2rgb = h => { h = h.replace('#', ''); return [0, 2, 4].map(i => parseInt(h.slice(i, i + 2), 16)); };
+const rgb2hex = (r, g, b) => '#' + [r, g, b].map(v => Math.max(0, Math.min(255, Math.round(v))).toString(16).padStart(2, '0')).join('');
+const lum = h => { const [r, g, b] = hex2rgb(h).map(v => { v /= 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); }); return 0.2126 * r + 0.7152 * g + 0.0722 * b; };
+const contrast = (a, b) => { const x = lum(a), y = lum(b); return (Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05); };
+const mix = (a, b, t) => { const p = hex2rgb(a), q = hex2rgb(b); return rgb2hex(p[0] + (q[0] - p[0]) * t, p[1] + (q[1] - p[1]) * t, p[2] + (q[2] - p[2]) * t); };
+const onColor = c => contrast('#ffffff', c) >= contrast('#14110f', c) ? '#ffffff' : '#14110f';
+const dist = (a, b) => { const p = hex2rgb(a), q = hex2rgb(b); return Math.hypot(p[0] - q[0], p[1] - q[1], p[2] - q[2]); };
+function fixFg(fg, bg, min) {
+  const target = lum(bg) > 0.4 ? '#000000' : '#ffffff';
+  for (let t = 0.04; t <= 1; t += 0.04) { const c = mix(fg, target, t); if (contrast(c, bg) >= min) return c; }
+  return target;
+}
+function fixBgOn(bg, min) {
+  for (let t = 0.04; t <= 1; t += 0.04) { const c = mix(bg, '#000000', t); if (contrast(onColor(c), c) >= min) return c; }
+  return '#000000';
+}
+function mutedFor(c) {
+  for (let k = 0.5; k > 0; k -= 0.05) { const m = mix(c.text, c.surface, k); if (contrast(m, c.surface) >= 4.5 && contrast(m, c.background) >= 4.5) return m; }
+  return c.text;
+}
+
+/* ---------- sample assets ---------- */
+const svgUri = s => 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(s);
+const SAMPLE_LOGO = svgUri('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120"><circle cx="60" cy="60" r="58" fill="#d9432f"/><circle cx="60" cy="60" r="43" fill="#f2b632"/><text x="60" y="71" text-anchor="middle" font-family="Georgia, serif" font-weight="700" font-size="31" fill="#2a1a12">BML</text></svg>');
+function artInner(kind, h) {
+  if (kind === 'roll') return `<ellipse cx="60" cy="54" rx="52" ry="30" fill="#ffffff" opacity=".9"/><g transform="rotate(-14 60 48)"><rect x="18" y="32" width="46" height="23" rx="11.5" fill="#f6f1e8" stroke="#dfd4c2"/><rect x="24" y="38" width="34" height="11" rx="5.5" fill="${h}" opacity=".75"/><rect x="28" y="37" width="13" height="6" rx="3" fill="#7cb25a" opacity=".85"/></g><g transform="rotate(-14 60 48)"><rect x="56" y="50" width="46" height="23" rx="11.5" fill="#f6f1e8" stroke="#dfd4c2"/><rect x="62" y="56" width="34" height="11" rx="5.5" fill="${h}" opacity=".75"/><rect x="74" y="55" width="14" height="6" rx="3" fill="#7cb25a" opacity=".85"/></g><ellipse cx="98" cy="24" rx="10" ry="7" fill="#b5532e" opacity=".85"/>`;
+  if (kind === 'bowl') return `<ellipse cx="60" cy="49" rx="45" ry="35" fill="#ffffff"/><ellipse cx="60" cy="47" rx="37" ry="28" fill="${h}"/><path d="M33 45c8-6 14 6 22 0s14 6 22 0 12 4 14 2" stroke="#f6ecd0" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M35 55c8-6 14 6 22 0s14 6 22 0" stroke="#f6ecd0" stroke-width="3" fill="none" stroke-linecap="round"/><circle cx="47" cy="36" r="5" fill="#6aa84f"/><circle cx="72" cy="38" r="4" fill="#6aa84f"/><circle cx="61" cy="62" r="4" fill="#e04b3a"/><ellipse cx="75" cy="55" rx="8" ry="5" fill="#8b4a2e"/>`;
+  if (kind === 'banhmi') return `<ellipse cx="60" cy="56" rx="54" ry="25" fill="#ffffff" opacity=".9"/><path d="M12 54c10-22 84-26 96-6 4 8-4 14-14 16-24 4-58 4-74 0-8-2-10-6-8-10z" fill="#d79a52"/><path d="M20 54c16-6 62-8 82-2" stroke="#7cb25a" stroke-width="5" stroke-linecap="round" fill="none"/><path d="M22 58c16-4 58-6 78-1" stroke="${h}" stroke-width="4" stroke-linecap="round" fill="none"/><path d="M30 41l8-4M50 37l8-3M70 36l8-2" stroke="#b97a3a" stroke-width="2" stroke-linecap="round"/>`;
+  return `<path d="M43 16h34l-4 64H47z" fill="#ffffff" opacity=".9"/><path d="M45 40h30l-2 38H47z" fill="${h}"/><rect x="51" y="29" width="10" height="10" rx="2" fill="#ffffff" opacity=".75" transform="rotate(12 56 34)"/><rect x="62" y="33" width="9" height="9" rx="2" fill="#ffffff" opacity=".6"/><path d="M67 5l-5 42" stroke="#2f2f2f" stroke-width="2.5"/>`;
+}
+const PH_IMG = '<rect width="120" height="90" fill="#E6E6E3"/><g fill="none" stroke="#C9C9C4" stroke-width="2.5" stroke-linejoin="round"><rect x="46" y="31" width="28" height="22" rx="3"/><circle cx="54" cy="39" r="2.5"/><path d="M46 50l9-8 7 6 4-3 8 7"/></g>';
+// Food photos are grey placeholders in the preview.
+const art = () => `<svg viewBox="0 0 120 90" preserveAspectRatio="xMidYMid slice" aria-hidden="true">${PH_IMG}</svg>`;
+const SAMPLE_BANNER = svgUri(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 90" preserveAspectRatio="xMidYMid slice">${PH_IMG}</svg>`);
+const PLACEHOLDER_LOGO = svgUri('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120"><circle cx="60" cy="60" r="58" fill="#E6E6E3"/><rect x="34" y="54" width="52" height="12" rx="6" fill="#C9C9C4"/></svg>');
+const ASSETS = { sampleLogo: SAMPLE_LOGO, sampleBanner: SAMPLE_BANNER, placeholderLogo: PLACEHOLDER_LOGO };
+// Neutral skeleton shown until the merchant picks a logo, so colour arrives with their choice.
+const SKELETON = { brand: '#7d7d7a', accent: '#b4b4b0', background: '#ffffff', text: '#4a4a48', surface: '#ffffff', price: '#5f5f5c', lines: '#e2e2df', promo: '#7d7d7a', nutrition: '#6b6b68' };
+const asset = id => ASSETS[id] || ASSETS.sampleLogo;
+
+/* ---------- sample menu ---------- */
+const MENU = [
+  { cat: 'Rolls', items: [
+    { id: 'prawn', name: 'Fresh prawn rolls', desc: 'Rice paper, tiger prawn, mint, vermicelli and nuoc cham', price: 9.5, kj: 1120, art: 'roll', hue: '#e88a7d', badge: 'Popular' },
+    { id: 'lemchick', name: 'Lemongrass chicken rolls', desc: 'Chargrilled chicken, pickled carrot, lettuce, peanut sauce', price: 9, kj: 980, art: 'roll', hue: '#d9a441' },
+    { id: 'tofu', name: 'Crispy tofu rolls', desc: 'Five-spice tofu, cucumber and Thai basil. Vegan', price: 8.5, kj: 890, art: 'roll', hue: '#c9b46a' } ] },
+  { cat: 'Bowls', items: [
+    { id: 'pho', name: 'Pho bo', desc: 'Slow-cooked beef broth, rice noodles, brisket and fresh herbs', price: 15.5, from: true, kj: 2140, art: 'bowl', hue: '#c46a3a', badge: 'Best seller' },
+    { id: 'buncha', name: 'Bun cha', desc: 'Grilled pork, vermicelli, herbs and fish sauce dressing', price: 15.9, kj: 2380, art: 'bowl', hue: '#a8553a' },
+    { id: 'buntofu', name: 'Lemongrass tofu bun', desc: 'Tofu, vermicelli, pickles and crushed peanuts', price: 14.5, kj: 1960, art: 'bowl', hue: '#b9a24a' } ] },
+  { cat: 'Banh mi', items: [
+    { id: 'bmpork', name: 'Classic pork banh mi', desc: 'Roast pork, pâté, pickles, coriander and chilli', price: 11.5, kj: 2050, art: 'banhmi', hue: '#c27b3e', badge: 'Popular' },
+    { id: 'bmchick', name: 'Lemongrass chicken banh mi', desc: 'Chargrilled chicken, pickles, mayo and coriander', price: 11.5, kj: 1880, art: 'banhmi', hue: '#cf9a4a' } ] },
+  { cat: 'Drinks', items: [
+    { id: 'cafe', name: 'Vietnamese iced coffee', desc: 'Robusta drip coffee over condensed milk', price: 5.5, kj: 995, art: 'drink', hue: '#8a5a3a' },
+    { id: 'coco', name: 'Fresh coconut water', desc: 'Served chilled', price: 4.5, kj: 420, art: 'drink', hue: '#d9cfa8' } ] }
+];
+const money = n => '$' + n.toFixed(2);
+
+/* ---------- presets and fonts ---------- */
+const FONT_PAIRS = [
+  { id: 'system', name: 'System', h: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif", b: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif" },
+  { id: 'clean', name: 'Clean', h: "'DM Sans', system-ui, sans-serif", b: "'DM Sans', system-ui, sans-serif" },
+  { id: 'friendly', name: 'Friendly', h: "'Nunito', system-ui, sans-serif", b: "'Nunito', system-ui, sans-serif" },
+  { id: 'condensed', name: 'Condensed', h: "'Oswald', 'Arial Narrow', sans-serif", b: "'Barlow', system-ui, sans-serif" },
+  { id: 'street', name: 'Street', h: "'Archivo Black', Impact, sans-serif", b: "'Archivo', system-ui, sans-serif" },
+  { id: 'bistro', name: 'Bistro', h: "'Fraunces', Georgia, serif", b: "'Work Sans', system-ui, sans-serif" },
+  { id: 'classic', name: 'Classic', h: "'Playfair Display', Georgia, serif", b: "'Source Sans 3', system-ui, sans-serif" }
+];
+const pairOf = id => FONT_PAIRS.find(f => f.id === id) || FONT_PAIRS[0];
+const PRESETS = {
+  rolld: {
+    name: 'Fresh', blurb: 'Friendly, rounded, colour-led', long: 'Rounded cards, pill buttons and a loyalty pill. Images sit left of each item with kJ shown. Suits fresh-casual brands.',
+    colors: { brand: '#173d31', accent: '#e98a3c', background: '#ffffff', text: '#1f2a24', surface: '#ffffff', price: '#1f2a24', lines: '#e7e2d9', promo: '@brand', nutrition: '@accent' },
+    fontPair: 'system', heading: { upper: false, spacing: 0, weight: 600 }, shape: { radius: 14, card: 'border', button: 'pill' },
+    layout: { items: 'list', tabs: 'pill', header: 'plain', photos: true }, item: { image: 'left', desc: true, from: true, energy: 'kJ', badges: true },
+    widgets: { location: true, time: true, loyalty: true, search: true, cart: true }
+  },
+  chipotle: {
+    name: 'Bold', blurb: 'Strong, warm, uppercase', long: 'Condensed uppercase headings, square corners and flat cards. Photo tiles run edge to edge. Suits bold quick-service brands.',
+    colors: { brand: '#451500', accent: '#ac2424', background: '#ffffff', text: '#451500', surface: '#ffffff', price: '#451500', lines: '#e8ddd0', promo: '@accent', nutrition: '#7a5a46' },
+    fontPair: 'condensed', heading: { upper: true, spacing: 0.04, weight: 600 }, shape: { radius: 2, card: 'flat', button: 'square' },
+    layout: { items: 'tile', tabs: 'pill', header: 'plain', photos: true }, item: { image: 'bleed', desc: false, from: false, energy: 'cal', badges: false },
+    widgets: { location: true, time: true, loyalty: false, search: false, cart: true }
+  }
+};
+const defaultBrand = () => ({ name: 'Geelong', logo: 'sampleLogo', bannerType: 'photo', banner: 'sampleBanner', headline: 'Fresh rolls, rolled to order', promo: '2 rolls + drink $15' });
+const photosOf = t => t.photos || (t.photos = { show: true, layout: 'list', size: 'm' });
+const PHOTO_PX = { s: 72, m: 96, l: 120 };
+const tabsOf = t => t.tabs || (t.tabs = { style: 'outline', matchBrand: true, color: t.colors.brand });
+function buildTheme(id, keep = {}) {
+  const p = clone(PRESETS[id]); const c = p.colors;
+  if (keep.brand) c.brand = keep.brand;
+  if (keep.accent) c.accent = keep.accent;
+  for (const k in c) { if (c[k] === '@brand') c[k] = c.brand; if (c[k] === '@accent') c[k] = c.accent; }
+  return { preset: id, colors: c, fontPair: p.fontPair, heading: p.heading, shape: p.shape, layout: p.layout, item: p.item, widgets: p.widgets,
+    brand: keep.brandInfo ? clone(keep.brandInfo) : defaultBrand(), customFonts: keep.customFonts ? clone(keep.customFonts) : { heading: null, body: null }, fontLicence: !!keep.fontLicence,
+    tabs: keep.tabs ? clone(keep.tabs) : { style: 'outline', matchBrand: true, color: '#173d31' }, linkStyle: keep.linkStyle || 'text', photos: keep.photos ? clone(keep.photos) : { show: true, layout: 'list', size: 'm' } };
+}
+function currentLook(info) {
+  const t = buildTheme('rolld', { brand: '#d7262e', accent: '#f08a5d', brandInfo: info });
+  t.preset = 'current';
+  Object.assign(t.colors, { background: '#f7f1e6', text: '#2a211b', surface: '#ffffff', price: '#b81f26', lines: '#e6dccd', promo: '#d7262e', nutrition: '#6f6253' });
+  t.fontPair = 'system'; t.heading = { upper: false, spacing: 0, weight: 600 }; t.shape = { radius: 6, card: 'border', button: 'square' };
+  t.layout = { items: 'list', tabs: 'underline', header: 'brand', photos: true }; t.item = { image: 'left', desc: true, from: false, energy: 'off', badges: false };
+  t.widgets = { location: true, time: true, loyalty: false, search: false, cart: true };
+  return t;
+}
+
+/* ---------- state ---------- */
+const KEY = 'nomni-theme-builder-v1';
+const S = {
+  onboarded: false, theme: null, published: null, section: 'brand',
+  device: 'mobile', screen: 'menu',
+  share: { token: newToken(), days: 7, created: Date.now() },
+  ob: { step: 1, name: 'Geelong', logo: null, found: [], brand: null, accent: null, preset: 'rolld', err: '' },
+  found: [], fontErr: {}, savedAt: null, preview: false, view: 'real', pvDevice: innerWidth < 980 ? 'mobile' : 'desktop'
+};
+function newToken() { return Math.random().toString(36).slice(2, 10); }
+function load() {
+  try {
+    const d = JSON.parse(localStorage.getItem(KEY) || 'null');
+    if (d && d.theme && d.published) { Object.assign(S, { theme: d.theme, published: d.published, onboarded: !!d.onboarded, share: d.share || S.share }); Object.assign(ASSETS, d.assets || {}); }
+  } catch (e) { /* storage unavailable: start fresh */ }
+}
+function userAssets() { const o = {}; for (const k in ASSETS) if (!['sampleLogo', 'sampleBanner', 'placeholderLogo'].includes(k)) o[k] = ASSETS[k]; return o; }
+let saveT;
+function saveSoon() { clearTimeout(saveT); saveT = setTimeout(save, 400); }
+function save() {
+  const base = { theme: S.theme, published: S.published, onboarded: S.onboarded, share: S.share };
+  try { localStorage.setItem(KEY, JSON.stringify({ ...base, assets: userAssets() })); }
+  catch (e) { try { localStorage.setItem(KEY, JSON.stringify({ ...base, assets: {} })); } catch (_) { /* ignore */ } }
+  S.savedAt = new Date(); refreshStatus();
+}
+
+/* history: up to 50 undo steps */
+let H = [], hi = -1;
+function resetHistory() { H = [JSON.stringify(S.theme)]; hi = 0; }
+function commit() {
+  const s = JSON.stringify(S.theme);
+  if (H[hi] === s) return;
+  H = H.slice(0, hi + 1); H.push(s); if (H.length > 51) H.shift(); hi = H.length - 1;
+  refreshStatus(); saveSoon();
+}
+function undo() { if (hi > 0) { hi--; S.theme = JSON.parse(H[hi]); rerenderAll(); } }
+function redo() { if (hi < H.length - 1) { hi++; S.theme = JSON.parse(H[hi]); rerenderAll(); } }
+
+/* ---------- fonts ---------- */
+const FACES = {};
+function dataUrlToBuffer(u) { const b = atob(u.split(',')[1]); const a = new Uint8Array(b.length); for (let i = 0; i < b.length; i++) a[i] = b.charCodeAt(i); return a.buffer; }
+async function registerFont(slot, id) {
+  const fam = slot === 'heading' ? 'NomniHeading' : 'NomniBody';
+  const face = new FontFace(fam, dataUrlToBuffer(ASSETS[id]));
+  await face.load();
+  if (FACES[slot]) document.fonts.delete(FACES[slot].face);
+  document.fonts.add(face); FACES[slot] = { face, id };
+}
+async function syncFonts() {
+  for (const slot of ['heading', 'body']) {
+    const ref = S.theme?.customFonts?.[slot];
+    if (ref && ASSETS[ref.id] && FACES[slot]?.id !== ref.id) { try { await registerFont(slot, ref.id); renderFrames(); } catch (e) { /* fallback pairing shows */ } }
+    if (!ref && FACES[slot]) { document.fonts.delete(FACES[slot].face); delete FACES[slot]; }
+  }
+}
+
+/* ---------- icons ---------- */
+const sv = (d, w = 2) => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${w}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`;
+const IC = {
+  menu: sv('<path d="M4 7h16M4 12h16M4 17h16"/>'), search: sv('<circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/>'),
+  bag: sv('<path d="M5 8h14l-1.2 11a2 2 0 0 1-2 1.8H8.2a2 2 0 0 1-2-1.8z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/>'),
+  pin: sv('<path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/>'),
+  clock: sv('<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>'), chev: sv('<path d="M6 9l6 6 6-6"/>'),
+  right: sv('<path d="M9 6l6 6-6 6"/>'), back: sv('<path d="M15 6l-6 6 6 6"/>'), plus: sv('<path d="M12 5v14M5 12h14"/>', 2.6),
+  x: sv('<path d="M6 6l12 12M18 6L6 18"/>'), undo: sv('<path d="M9 14L4 9l5-5"/><path d="M4 9h10a6 6 0 0 1 0 12h-3"/>'),
+  redo: sv('<path d="M15 14l5-5-5-5"/><path d="M20 9H10a6 6 0 0 0 0 12h3"/>'), upload: sv('<path d="M12 16V4M7 9l5-5 5 5"/><path d="M5 20h14"/>'),
+  sparkle: sv('<path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/>', 1.8),
+  template: sv('<rect x="3" y="3" width="8" height="8" rx="2"/><rect x="13" y="3" width="8" height="8" rx="2"/><rect x="3" y="13" width="8" height="8" rx="2"/><rect x="13" y="13" width="8" height="8" rx="2"/>', 1.8),
+  brand: sv('<rect x="3" y="5" width="18" height="14" rx="3"/><circle cx="9" cy="10" r="2"/><path d="M21 16l-5-5-8 8"/>', 1.8),
+  colours: sv('<path d="M12 3s6 6.4 6 11a6 6 0 0 1-12 0c0-4.6 6-11 6-11z"/>', 1.8),
+  fonts: sv('<path d="M4 19l5-14 5 14M6 14h6M15 19v-6a3 3 0 0 1 6 0v6M15 16h6"/>', 1.8),
+  shape: sv('<path d="M4 20V10a6 6 0 0 1 6-6h10"/><path d="M4 20h16V4"/>', 1.8),
+  layout: sv('<rect x="3" y="4" width="18" height="16" rx="3"/><path d="M3 10h18M9 10v10"/>', 1.8),
+  header: sv('<rect x="3" y="4" width="18" height="16" rx="3"/><path d="M3 9h18"/><circle cx="7" cy="6.5" r=".5"/>', 1.8),
+  items: sv('<rect x="3" y="4" width="18" height="7" rx="2"/><rect x="3" y="13" width="18" height="7" rx="2"/><path d="M7 7.5h6M7 16.5h6"/>', 1.8),
+  links: sv('<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M14 14h3v3M21 14v7h-7M17 21v-3"/>', 1.8),
+  restart: sv('<path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/>', 1.8), help: sv('<circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/>')
+};
+
+/* ---------- storefront renderer ---------- */
+function storeVars(t) {
+  const c = t.colors, fp = pairOf(t.fontPair), cf = t.customFonts || {};
+  const hf = (cf.heading ? "'NomniHeading', " : '') + fp.h, bf = (cf.body ? "'NomniBody', " : '') + fp.b, r = t.shape.radius;
+  return [`--b:${c.brand}`, `--a:${c.accent}`, `--bg:${c.background}`, `--tx:${c.text}`, `--sf:${c.surface}`, `--pr:${c.price}`, `--ln:${c.lines}`,
+    `--pm:${c.promo}`, `--nu:${c.nutrition}`, `--onb:${onColor(c.brand)}`, `--ona:${onColor(c.accent)}`, `--onpm:${onColor(c.promo)}`,
+    `--mut:${mutedFor(c)}`, `--tint:${mix(c.background, c.brand, 0.07)}`, `--r:${r}px`, `--btnr:${t.shape.button === 'pill' ? '999px' : r + 'px'}`,
+    `--hf:${hf}`, `--bf:${bf}`, `--htt:${t.heading.upper ? 'uppercase' : 'none'}`, `--hls:${t.heading.spacing}em`, `--hw:${t.heading.weight}`].join(';');
+}
+const energy = (t, kj) => t.item.energy === 'kJ' ? kj + ' kJ' : t.item.energy === 'cal' ? Math.round(kj / 4.184) + ' Cal' : '';
+function itemCard(t, it) {
+  const I = t.item, ph = t.layout.photos, tile = t.layout.items === 'tile';
+  const pos = tile ? (I.image === 'bleed' ? 'bleed' : 'inset') : I.image;
+  const en = energy(t, it.kj);
+  return `<article class="s-card s-item img-${pos}${ph ? '' : ' no-img'}" data-sec="items">${ph ? `<div class="s-img">${art(it)}</div>` : ''}<div class="s-item-b">${I.badges && it.badge ? `<span class="s-badge">${it.badge}</span>` : ''}<h3 class="s-h s-iname">${esc(it.name)}</h3>${I.desc ? `<p class="s-desc">${esc(it.desc)}</p>` : ''}<div class="s-meta"><span class="s-pr">${it.from && I.from ? '<small>From</small> ' : ''}${money(it.price)}</span>${en ? `<span class="s-en">${en}</span>` : ''}</div></div><span class="s-add" aria-hidden="true">${IC.plus}</span></article>`;
+}
+const cartLines = () => `<div class="s-lines"><div class="s-line"><span class="s-qty">1</span><span>Pho bo<small>Large · Bean sprouts</small></span><span>$17.50</span></div><div class="s-line"><span class="s-qty">1</span><span>Fresh prawn rolls<small>Extra nuoc cham</small></span><span>$9.50</span></div><div class="s-tot"><span>Subtotal</span><span>$27.00</span></div></div>`;
+const opt = (label, extra, on, check, sub) => `<div class="s-opt${on ? ' on' : ''}"><span class="${check ? 's-check' : 's-radio'}"></span><span>${label}${sub ? `<small>${sub}</small>` : ''}</span>${extra ? `<span class="s-x">${extra}</span>` : ''}</div>`;
+function overlay(t, sc, d, pv) {
+  const off = pv ? ' disabled' : '', grab = d ? '' : '<div class="s-grab"></div>';
+  if (sc === 'item') {
+    const it = MENU[1].items[0], en = energy(t, it.kj);
+    return `<div class="s-dim"></div><div class="s-sheet" data-sec="items">${grab}<div class="s-sheet-hero">${art(it)}</div><div class="s-sheet-b"><div><h2 class="s-h s-sheet-t">${it.name}</h2><p class="s-desc s-desc-full">${it.desc}</p><div class="s-meta-row"><span class="s-pr">${money(it.price)}</span>${en ? `<span class="s-en">${en}</span>` : ''}</div></div><div class="s-grp"><div class="s-opt-h"><h3 class="s-h s-grp-t">Size</h3><span class="s-req">Required</span></div>${opt('Regular', '', false)}${opt('Large', '+$2.00', true)}</div><div class="s-grp"><div class="s-opt-h"><h3 class="s-h s-grp-t">Extras</h3><span class="s-mut">Optional</span></div>${opt('Bean sprouts', 'Free', true, true)}${opt('Extra brisket', '+$3.00', false, true)}</div></div><div class="s-sheet-foot"><div class="s-step"><span>−</span>1<span>+</span></div><button class="s-btn s-btn-p" tabindex="-1"${off}>${pv ? 'Ordering is off in previews' : 'Add to order · $17.50'}</button></div></div>`;
+  }
+  if (sc === 'cart' && !d) {
+    return `<div class="s-dim"></div><div class="s-sheet" data-sec="header">${grab}<div class="s-sheet-b"><h2 class="s-h s-sheet-t">Your order</h2>${t.widgets.location ? `<div class="s-chip s-chip-w">${IC.pin}Pick up · Surry Hills · ASAP</div>` : ''}${cartLines()}<button class="s-btn s-btn-p" tabindex="-1"${off}>${pv ? 'Ordering is off in previews' : 'Checkout · $27.00'}</button></div></div>`;
+  }
+  if (sc === 'setup') {
+    return `<div class="s-dim"></div><div class="s-sheet" data-sec="header">${grab}<div class="s-sheet-b"><h2 class="s-h s-sheet-t">How would you like your order?</h2><div class="s-grp">${opt('Pick up', 'Ready in 10 min', true)}${opt('Delivery', 'From $4.99', false)}${opt('Dine in', 'Order to your table', false)}</div><div class="s-grp"><h3 class="s-h s-grp-t">Location</h3><div class="s-opt on"><span class="s-ico-s">${IC.pin}</span><span>Surry Hills<small>412 Crown St · 1.2 km</small></span><span class="s-x">Change</span></div></div><div class="s-grp"><div class="s-opt-h"><h3 class="s-h s-grp-t">Pickup time</h3><span class="s-mut">Today</span></div><div class="s-slots">${['ASAP', '12:15', '12:30', '12:45', '1:00', '1:15'].map((s, i) => `<span class="s-slot${i ? '' : ' on'}">${s}</span>`).join('')}</div></div><button class="s-btn s-btn-p" tabindex="-1">Confirm</button></div></div>`;
+  }
+  return '';
+}
+function checkout(pv) {
+  const off = pv ? ' disabled' : '';
+  return `<div class="s-co" data-sec="shape"><div class="s-co-main"><div class="s-co-hd"><span class="s-ico">${IC.back}</span><h1 class="s-h s-co-t">Checkout</h1></div><div class="s-card s-box"><h2 class="s-h s-grp-t">Pick up</h2><p class="s-p">Surry Hills · 412 Crown St<br>Today, ASAP (about 10 min)</p></div><div class="s-card s-box"><h2 class="s-h s-grp-t">Your details</h2><div class="s-field">Name<div>Alex Tran</div></div><div class="s-field">Mobile<div>0400 000 000</div></div></div><div class="s-card s-box"><h2 class="s-h s-grp-t">Payment</h2>${opt('Card', 'Visa ending 4242', true)}${opt('Apple Pay', '', false)}</div></div><div class="s-card s-box"><h2 class="s-h s-grp-t">Order summary</h2>${cartLines()}<div class="s-line"><span></span><span>Service fee</span><span>$0.50</span></div><div class="s-tot"><span>Total</span><span>$27.50</span></div><button class="s-btn s-btn-p" tabindex="-1"${off}>${pv ? 'Ordering is off in previews' : 'Place order · $27.50'}</button></div></div>`;
+}
+function renderStore(t, o = {}) {
+  const d = !!o.desktop, sc = o.screen || 'menu', pv = !!o.preview, w = t.widgets, L = t.layout, B = t.brand;
+  const off = pv ? ' disabled' : '';
+  const header = `<header class="s-hd${L.header === 'brand' ? ' is-brand' : ''}" data-sec="brand"><div class="s-hd-l">${d ? '' : `<span class="s-ico">${IC.menu}</span>`}<img class="s-logo" src="${asset(B.logo)}" alt=""><span class="s-name">${esc(B.name)}</span></div>${d ? '<nav class="s-nav"><span>Menu</span><span>Rewards</span><span>Locations</span></nav>' : ''}<div class="s-hd-r" data-sec="header">${w.search ? `<span class="s-ico">${IC.search}</span>` : ''}${w.cart && !d ? `<span class="s-ico">${IC.bag}<i class="s-dot">2</i></span>` : ''}${d ? '<span class="s-signin">Sign in</span>' : ''}</div></header>`;
+  const banner = `<section class="s-ban ${B.bannerType === 'photo' ? 'photo' : 'colour'}" data-sec="brand">${B.bannerType === 'photo' ? `<img src="${asset(B.banner)}" alt="">` : ''}<div class="s-ban-txt">${B.headline ? `<h1 class="s-h">${esc(B.headline)}</h1>` : ''}${B.promo ? `<span class="s-promo">${esc(B.promo)}</span>` : ''}</div></section>`;
+  const setup = (w.location || w.time) ? `<div class="s-setup" data-sec="header">${w.location ? `<span class="s-chip">${IC.pin}Pick up · Surry Hills${IC.chev}</span>` : ''}${w.time ? `<span class="s-chip">${IC.clock}Today, ASAP${IC.chev}</span>` : ''}</div>` : '';
+  const loyal = w.loyalty ? `<div class="s-loyal" data-sec="header"><b>Lane Rewards</b><span>120 points</span><span class="s-loyal-v">$2.00 to spend</span></div>` : '';
+  const tabs = `<div class="s-tabs ${L.tabs}" data-sec="layout">${MENU.map((m, i) => `<span class="s-tab${i ? '' : ' on'}">${m.cat}</span>`).join('')}</div>`;
+  const secs = MENU.map(m => `<section class="s-sec"><h2 class="s-h s-sech">${m.cat}</h2><div class="s-items ${L.items}" data-sec="layout">${m.items.map(it => itemCard(t, it)).join('')}</div></section>`).join('');
+  const aside = d ? `<aside class="s-card s-aside${sc === 'cart' ? ' is-focus' : ''}" data-sec="header"><h2 class="s-h s-asideh">Your order</h2>${w.location ? `<div class="s-chip s-chip-w">${IC.pin}Pick up · Surry Hills · ASAP</div>` : ''}${cartLines()}<button class="s-btn s-btn-p" tabindex="-1"${off}>${pv ? 'Ordering is off in previews' : 'Checkout · $27.00'}</button></aside>` : '';
+  const main = banner + setup + loyal + tabs + secs;
+  let body = d ? `<div class="s-body"><div class="s-main">${main}</div>${aside}</div>` : `${main}<div class="s-spacer"></div>`;
+  if (sc === 'checkout') body = checkout(pv);
+  const bar = (!d && w.cart && sc !== 'checkout') ? `<div class="s-cartbar" data-sec="shape"><span class="s-btn s-btn-p"><span>View order · 2 items</span><b>$27.00</b></span></div>` : '';
+  return `<div class="st" data-desktop="${d ? 1 : 0}" data-card="${t.shape.card}" style="${storeVars(t)}"><div class="st-scroll">${header}${body}</div>${bar}${overlay(t, sc, d, pv)}</div>`;
+}
+
+/* frames */
+const phoneHTML = (t, o, id) => `<div class="scaler" data-scale data-w="390" data-h="780"><div class="phone"><div class="ph-in" style="background:${t.colors.background};color:${t.colors.text}"><div class="ph-status"><span>9:41</span><span></span></div><div class="ph-screen"${id ? ` id="${id}"` : ''}>${renderStore(t, o)}</div></div></div></div>`;
+const deskHTML = (t, o, id) => `<div class="scaler" data-scale data-w="1280" data-h="800"><div class="desk"><div class="dk-bar"><i></i><i></i><i></i><span class="dk-url">w.abacus.co/Store/banh-mi-lane</span></div><div class="dk-screen"${id ? ` id="${id}"` : ''}>${renderStore(t, o)}</div></div></div>`;
+let ro;
+function setupScale() {
+  ro?.disconnect();
+  ro = new ResizeObserver(es => { for (const e of es) {
+    const el = e.target, s = Math.min(1, e.contentRect.width / +el.dataset.w);
+    el.firstElementChild.style.transform = `scale(${s})`; el.style.height = (+el.dataset.h * s) + 'px';
+  } });
+  $$('[data-scale]').forEach(el => ro.observe(el));
+}
+/* ---------- real Roll'd UI preview ----------
+   The Roll'd prototype ships with this page (rolld/). It is built on design tokens
+   (--green-dark, --price, --bg-page …), so the theme is applied by overriding them. */
+const GF = 'https://fonts.googleapis.com/css2?family=Archivo+Black&family=Archivo:wght@400;600&family=Barlow:wght@400;500;600&family=DM+Sans:wght@400;500;700&family=Fraunces:wght@600;700&family=Nunito:wght@400;700;800&family=Oswald:wght@500;600;700&family=Playfair+Display:wght@600;700&family=Source+Sans+3:wght@400;600&family=Work+Sans:wght@400;600&display=swap';
+let PROTO = null, PROTO_OK = null;
+async function getProto() {
+  if (PROTO) return PROTO;
+  const r = await fetch('rolld/prototype.html'); if (!r.ok) throw new Error('missing');
+  PROTO = await r.text(); PROTO_OK = true; return PROTO;
+}
+const realOn = () => S.view === 'real' && PROTO_OK !== false;
+function injectProto(html) {
+  const base = new URL('rolld/', location.href).href;
+  const extra = `<base href="${base}"><link rel="stylesheet" href="${GF}"><style>html,body{background:transparent!important}html:not(.is-desktop) body{padding:10px 0!important}#screen-landing{display:none!important}#flowindex-link,#devinspector-toggle,#devinspector-highlight,#devinspector-label,#devinspector-panel{display:none!important}#screen-menu .menu-header{align-items:center!important}#screen-menu .hamburger-btn{display:flex!important;align-items:center;justify-content:center}#screen-menu .hamburger-btn svg{display:block}img:not([data-nomni-logo]):not([src$=".svg"]){object-position:-99999px 99999px!important;background:#E6E6E3!important}[style*="background-image"]{background-image:none!important;background-color:#E6E6E3!important}</style><style id="nomni-theme"></style>`;
+  // Skip the loyalty landing (it has its own builder): open on the menu, and send Home / back-to-landing to the menu too.
+  const toMenu = `<script>(function(){function toMenu(){try{closeSidebar()}catch(e){}hideAllScreens();document.getElementById('screen-menu').classList.remove('hidden');}window.goHome=toMenu;window.goToLanding=toMenu;document.addEventListener('DOMContentLoaded',function(){toMenu();setTimeout(toMenu,0);});})();<\/script>`;
+  return html.replace(/<head>/i, '<head>' + extra).replace(/<\/body>/i, toMenu + '</body>');
+}
+// Text that the Roll'd design paints in its brand green: in the builder these follow the Text colour,
+// so a bright logo colour lands only on buttons, selected tabs, badges and icons.
+// Dish, store and outlet names: the design system's --green-mid role (brand shade or Text, merchant's choice).
+const NAMES = '.reorder-card-name,.recommend-name,.meal-name,.mealdetail-hero-text.plain .name,.extra-name,.cart-order-card .order-name,.store-name,.outlet-name';
+const NEUTRAL_TEXT = '.menu-section-title,.cart-info-row .value,.cart-review-time,.desk-store-name,.earn-row-title,.earn-row-sub,.sidebar-subitem-value,.sidebar-points-balance,.mealdetail-promo .promo-title,.mealdetail-promo .promo-sub,.note-row,.cat-tab:not(.selected),.mf-pill:not(.selected),.filter-pill,.option:not(.selected),.lang-option';
+const NEUTRAL_LINKS = '.reorder-section-link,.checkout-link,.cart-add-more-link,.cart-section-row .link,.filters-reset-link,.link-btn,.order-success-row .value.link,.profile-back-link,.order-details-footer .support-link,.oh-item-more,.guest-link-note';
+// The Roll'd design hard-codes these corners (cards 14px, pills 12px); Corner radius drives them instead.
+const RADIUS_CARDS = '.meal-card,.recommend-card,.reorder-card,.cart-order-card';
+const RADIUS_CHIPS = '.filter-pill,.cat-tab,.mf-pill,.date-pill,.time-slot,.option';
+// Dish photos: hide them, or set the list thumbnail size (cards, recommended row and desktop).
+function photoCss(t) {
+  const ph = photosOf(t), px = PHOTO_PX[ph.size] || 96;
+  if (!ph.show) return '.meal-thumb,.recommend-thumb{display:none!important}';
+  return `#menu-body-scroll.list-view .meal-thumb,html.is-desktop #menu-body-scroll .meal-thumb,.recommend-thumb{width:${px}px!important;height:${px}px!important}`;
+}
+// Selected meal-category tab: outline, filled or underline, in the brand colour or its own colour.
+function tabCss(t) {
+  const tb = tabsOf(t), c = t.colors, tc = tb.matchBrand ? c.brand : tb.color;
+  if (tb.style === 'filled') return `.cat-tab.selected{background:${tc}!important;border-color:${tc}!important;color:${onColor(tc)}!important}`;
+  if (tb.style === 'underline') return `.cat-tab{border-radius:0!important;border-color:transparent!important;background:none!important}.cat-tab.selected{border-bottom:2.5px solid ${tc}!important;color:${c.text}!important}`;
+  return `.cat-tab.selected{border-color:${tc}!important;background:${c.surface}!important}`;
+}
+// Title tiers from design-system.css (display, title 1-3). Item names, buttons and section headlines keep their own roles.
+const HEADINGS = '.t-display,.t-title-1,.t-title-2,.t-title-3,.menu-section-title,.section-title,.pickup-sheet-title,.profile-title,.desk-store-name,.landing-join-title,.landing-account-title';
+const titleWeight = t => (t.heading.weight >= 600 ? 600 : 400);
+function applyReal(ifr) {
+  const doc = ifr.contentDocument, t = S.theme; if (!doc || !doc.documentElement || !t) return;
+  const c = t.colors, r = t.shape.radius, fp = pairOf(t.fontPair), cf = t.customFonts || {};
+  const hf = (cf.heading ? "'NomniHeading', " : '') + fp.h, bf = (cf.body ? "'NomniBody', " : '') + fp.b, mut = mutedFor(c);
+  const P = palette(t);
+  const vars = {
+    '--green-dark': P.brandDark, '--green-mid': P.link, '--green-line': P.brandMid,
+    '--green-pale': P.brandPale, '--green-tint': P.brandTint, '--gold': c.accent,
+    '--cream': mix(c.accent, '#ffffff', 0.82), '--price': c.price, '--text-primary': P.text1, '--text-secondary': P.text2,
+    '--text-tertiary': P.text3, '--text-muted': P.text4, '--text-disabled': P.text5, '--text-on-dark': onColor(c.brand), '--border-strong': P.borderStrong, '--bg-page': c.background, '--bg-surface': c.surface,
+    '--bg-subtle': mix(c.background, c.text, 0.04), '--bg-highlight': mix(c.background, c.accent, 0.08), '--bg-loyalty': mix(c.background, c.text, 0.04),
+    '--bg-club': mix(c.brand, '#ffffff', 0.6), '--border': c.lines, '--border-subtle': mix(c.lines, c.surface, 0.5), '--border-warm': c.lines,
+    '--option-radius': r + 'px', '--sheet-radius': (r + 10) + 'px', '--radius-popup': Math.max(r, 4) + 'px', '--font-sans': bf, '--font-display': hf,
+    // design system: emphasis is 400 or 600 only; the heading choice reaches the title tiers through their role tokens
+    '--fw-display': titleWeight(t), '--fw-title-1': titleWeight(t), '--fw-title-2': titleWeight(t), '--fw-title-3': titleWeight(t)
+  };
+  for (const k in vars) doc.documentElement.style.setProperty(k, vars[k]);
+  const st = doc.getElementById('nomni-theme');
+  if (st) st.textContent = `${HEADINGS}{font-family:var(--font-display)!important;text-transform:${t.heading.upper ? 'uppercase' : 'none'};letter-spacing:${t.heading.spacing}em}${NEUTRAL_TEXT}{color:${c.text}!important}${NAMES}{color:${P.link}!important}${NEUTRAL_LINKS}{color:${P.link}!important${(t.linkStyle || 'text') === 'text' ? ';text-decoration:underline;text-underline-offset:2px' : ''}}.meal-badge{background:${c.accent}!important;color:${onColor(c.accent)}!important}.meal-cal{color:${c.nutrition}!important}${RADIUS_CARDS}{border-radius:${r}px!important}.recommend-thumb{border-radius:${Math.max(r - 4, 0)}px!important}${RADIUS_CHIPS}{border-radius:${r}px!important}${tabCss(t)}${photoCss(t)}`;
+  doc.getElementById('menu-body-scroll')?.classList.toggle('list-view', photosOf(t).layout !== 'grid');
+  applyLocation(ifr, doc, (t.brand.name || '').trim() || 'Geelong');
+  // The menu header's "Roll'd" wordmark is part of the brand logo: show the merchant's logo there.
+  doc.querySelectorAll('.menu-logo-text:not([data-nomni-done])').forEach(el => {
+    el.dataset.nomniDone = '1'; el.innerHTML = '<img data-nomni-logo="1" alt="" style="height:34px;width:auto;max-width:120px;object-fit:contain;display:block">'; el.style.margin = '0';
+  });
+  doc.querySelectorAll('img[data-nomni-logo], img[src*="Rolld Logo"]').forEach(img => { img.dataset.nomniLogo = '1'; img.src = asset(t.brand.logo); });
+  ifr._fonts = ifr._fonts || {};
+  for (const slot of ['heading', 'body']) {
+    const ref = cf[slot];
+    if (ref && ASSETS[ref.id] && ifr._fonts[slot]?.id !== ref.id) {
+      try {
+        const face = new ifr.contentWindow.FontFace(slot === 'heading' ? 'NomniHeading' : 'NomniBody', dataUrlToBuffer(ASSETS[ref.id]));
+        face.load().then(() => { if (ifr._fonts[slot]) doc.fonts.delete(ifr._fonts[slot].face); doc.fonts.add(face); ifr._fonts[slot] = { face, id: ref.id }; });
+      } catch (e) { /* the pairing shows instead */ }
+    }
+  }
+}
+// Store location replaces the outlet name ("Geelong") wherever the storefront shows it; street addresses stay.
+function applyLocation(ifr, doc, loc) {
+  if (!ifr._locNodes) {
+    ifr._locNodes = [];
+    const walk = doc.createTreeWalker(doc.body, NodeFilter.SHOW_TEXT, { acceptNode: n => /Geelong/.test(n.nodeValue) && !/VIC/.test(n.nodeValue) && !/^(SCRIPT|STYLE)$/.test(n.parentNode.nodeName) ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_SKIP });
+    while (walk.nextNode()) ifr._locNodes.push([walk.currentNode, walk.currentNode.nodeValue]);
+  }
+  for (const [node, orig] of ifr._locNodes) node.nodeValue = orig.replace(/Geelong/g, loc);
+  try { ifr.contentWindow.PICKUP_STORE = 'Roll\u2019d ' + loc; ifr.contentWindow.PICKUP_STORE_SHORT = loc; } catch (e) { /* prototype keeps its own */ }
+}
+async function bootReal() {
+  let html;
+  try { html = await getProto(); }
+  catch (e) { PROTO_OK = false; S.view = 'sample'; const f = $('#frames'); if (f) f.dataset.key = ''; renderFrames(); syncViewBar(); toast('The storefront could not load here, so a simplified preview is showing.'); return; }
+  $$('#frames iframe.rf').forEach(ifr => { ifr.addEventListener('load', () => applyReal(ifr)); ifr.srcdoc = injectProto(html); });
+}
+function syncViewBar() {
+  const real = realOn();
+  $$('[data-act="view"]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.id === (real ? 'real' : 'sample'))));
+  const sc = $('#screenSeg'); if (sc) sc.hidden = real;
+  const n = $('#stageNote'); if (n) n.textContent = real ? 'Storefront menu · click through it like a customer' : 'Sample menu · tap any part of the preview to edit it';
+}
+
+function renderFrames() {
+  const f = $('#frames'); if (!f || !S.theme) return;
+  const dev = S.preview ? S.pvDevice : S.device, pv = S.preview, sc = S.screen, real = realOn();
+  const showM = dev !== 'desktop', showD = dev !== 'mobile', key = dev + (real ? '|real' : '|sample');
+  if (f.dataset.key !== key) {
+    f.dataset.key = key; f.dataset.dev = dev;
+    f.classList.toggle('clickable', !real && !pv);
+    if (real) {
+      f.innerHTML = (showM ? `<div class="fr fr-m"><div class="scaler" data-scale data-w="410" data-h="864"><iframe class="rf rf-m" title="Mobile preview of the Roll'd UI"></iframe></div></div>` : '') +
+        (showD ? `<div class="fr fr-d"><div class="scaler" data-scale data-w="1280" data-h="840"><div class="desk real"><div class="dk-bar"><i></i><i></i><i></i><span class="dk-url">w.abacus.co/Store/banh-mi-lane</span></div><iframe class="rf rf-d" title="Desktop preview of the Roll'd UI"></iframe></div></div></div>` : '');
+      setupScale(); bootReal(); return;
+    }
+    f.innerHTML = (showM ? `<div class="fr fr-m">${phoneHTML(S.theme, { screen: sc, preview: pv }, 'fm')}</div>` : '') +
+      (showD ? `<div class="fr fr-d">${deskHTML(S.theme, { desktop: true, screen: sc, preview: pv }, 'fd')}</div>` : '');
+    setupScale(); return;
+  }
+  if (real) { $$('#frames iframe.rf').forEach(applyReal); return; }
+  for (const [id, desk] of [['fm', false], ['fd', true]]) {
+    const host = $('#' + id); if (!host) continue;
+    const sc0 = host.querySelector('.st-scroll')?.scrollTop || 0;
+    host.innerHTML = renderStore(S.theme, { desktop: desk, screen: sc, preview: pv });
+    const sc1 = host.querySelector('.st-scroll'); if (sc1) sc1.scrollTop = sc0;
+    const ph = host.closest('.ph-in'); if (ph) { ph.style.background = S.theme.colors.background; ph.style.color = S.theme.colors.text; }
+  }
+}
+
+/* ---------- checks ---------- */
+/* Design-system palette: the merchant picks a few colours; every token in design-system.css gets a value.
+   Brand family (dark / mid / line / pale / tint), five text tiers and the strong border are generated. */
+const STATUS = [['Open', '#1f9d55'], ['Error', '#c0392b'], ['Closed', '#b3261e']];
+function palette(t) {
+  const c = t.colors;
+  let mid = mix(c.brand, '#ffffff', 0.12);
+  if (contrast(mid, c.surface) < 4.5) mid = contrast(c.brand, c.surface) >= 4.5 ? c.brand : fixFg(c.brand, c.surface, 4.5);
+  let k = 0.6; for (; k > 0; k -= 0.02) { const m = mix(c.text, c.surface, k); if (contrast(m, c.surface) >= 4.5 && contrast(m, c.background) >= 4.5) break; }
+  const tertiary = mix(c.text, c.surface, Math.max(k, 0));
+  let strong = c.lines; for (let j = 0.05; contrast(strong, c.surface) < 3 && j <= 1; j += 0.05) strong = mix(c.lines, c.text, j);
+  return {
+    brandDark: c.brand, brandMid: mid, brandPale: mix(c.brand, c.background, 0.72), brandTint: mix(c.brand, c.background, 0.9),
+    text1: c.text, text2: mix(c.text, c.surface, Math.max(k, 0) / 2), text3: tertiary, text4: tertiary, text5: mix(c.text, c.surface, 0.72),
+    borderStrong: strong, link: (t.linkStyle || 'text') === 'brand' ? mid : c.text
+  };
+}
+function checks(t) {
+  const c = t.colors, P = palette(t), list = [
+    { label: 'Text on background', fg: c.text, bg: c.background, min: 4.5, key: 'text' },
+    { label: 'Text on cards', fg: c.text, bg: c.surface, min: 4.5, key: 'text' },
+    { label: 'Descriptions and captions', fg: P.text3, bg: c.surface, min: 4.5, key: 'text' },
+    { label: 'Dish names and links', fg: P.link, bg: c.surface, min: 4.5, key: (t.linkStyle || 'text') === 'brand' ? 'brand' : 'text' },
+    { label: 'Button text on brand', fg: onColor(c.brand), bg: c.brand, min: 4.5, bgKey: 'brand' },
+    { label: 'Prices on cards', fg: c.price, bg: c.surface, min: 4.5, key: 'price' },
+    { label: 'Calories on cards', fg: c.nutrition, bg: c.surface, min: 4.5, key: 'nutrition' },
+    { label: 'Badge text on accent', fg: onColor(c.accent), bg: c.accent, min: 4.5, bgKey: 'accent' },
+    { label: 'Selected tab and icons', fg: c.brand, bg: c.surface, min: 3, key: 'brand' },
+    { label: 'Radio rings and outlines', fg: P.borderStrong, bg: c.surface, min: 3, key: 'lines' }
+  ];
+  return list.map(x => ({ ...x, ratio: contrast(x.fg, x.bg) }));
+}
+function refreshChecks() {
+  const list = checks(S.theme), fails = list.filter(x => x.ratio < x.min).length;
+  const n = $('#checkN'); if (n) { n.hidden = !fails || !hasLogo(S.theme); n.textContent = fails; }
+  const box = $('#checks');
+  if (box) box.innerHTML = `<div class="sum${fails ? ' no' : ''}"><i>${fails ? '!' : '✓'}</i>${fails ? `${fails} ${fails === 1 ? 'pair needs' : 'pairs need'} more contrast` : 'Every pair meets WCAG AA'}</div><ul class="ck-list">${list.map((x, i) => {
+    const ok = x.ratio >= x.min;
+    return `<li class="ck ${ok ? 'ok' : 'no'}"><span class="ck-sw" style="background:${x.bg};color:${x.fg}">Aa</span><span class="ck-l">${x.label}<small>${x.ratio.toFixed(1)}:1 · needs ${x.min}:1</small></span>${ok ? '<span class="ck-pass">Pass</span>' : `<button class="pill pill-dark pill-sm" data-act="fix" data-i="${i}">Fix</button>`}</li>`;
+  }).join('')}</ul>`;
+  const cl = $('#classic'); if (cl) cl.innerHTML = classic(S.theme.colors).map(([k, v]) => `<span>${k}</span><span><i style="background:${v}"></i>${v.toUpperCase()}</span>`).join('');
+}
+function classic(c) {
+  const onb = onColor(c.brand);
+  return [['Title Bar', c.brand], ['Button Colour', c.brand], ['Menu Highlight', c.brand], ['Button Text', onb], ['Menu Highlight Text', onb], ['Landing Page Text Colour', onb],
+    ['Common Colour', c.accent], ['Status Pending', mix(c.accent, c.text, 0.3)], ['Text Colour', c.text], ['Menu Text', c.text], ['Menu Background', c.background], ['Menu Tab Background', mix(c.background, c.text, 0.05)]];
+}
+
+/* ---------- panel controls ---------- */
+const fid = p => 'f-' + p.replace(/\./g, '-');
+const get = (o, p) => p.split('.').reduce((a, k) => a?.[k], o);
+function setPath(o, p, v) { const ks = p.split('.'); let a = o; ks.slice(0, -1).forEach(k => { a = a[k]; }); a[ks.at(-1)] = v; }
+const colorRow = (p, label, hint) => { const v = get(S.theme, p); return `<div class="row"><span class="rl">${label}${hint ? `<small>${hint}</small>` : ''}</span><span class="cpick"><input type="color" id="${fid(p)}" data-bind="${p}" value="${v}" aria-label="${label}"><input class="hex" id="h-${fid(p)}" data-bind="${p}" data-kind="hex" value="${v}" maxlength="7" spellcheck="false" aria-label="${label} hex value"></span></div>`; };
+const segCtl = (p, opts, label, num) => { const cur = get(S.theme, p); return `<div class="seg" role="group" aria-label="${label}">${opts.map(([v, l]) => `<button type="button" data-set="${p}" data-val="${v}"${num ? ' data-type="num"' : ''} aria-pressed="${String(cur) === String(v)}">${l}</button>`).join('')}</div>`; };
+const segRow = (p, opts, label, num) => `<div class="row" style="flex-wrap:wrap"><span class="rl">${label}</span>${segCtl(p, opts, label, num)}</div>`;
+const togRow = (p, label, hint) => `<div class="row"><label for="${fid(p)}">${label}${hint ? `<small>${hint}</small>` : ''}</label><span class="tog"><input type="checkbox" id="${fid(p)}" data-bind="${p}" ${get(S.theme, p) ? 'checked' : ''}><span></span></span></div>`;
+const textField = (p, label, ph) => `<label class="tf" for="${fid(p)}"><span class="label">${label}</span><input id="${fid(p)}" data-bind="${p}" value="${esc(get(S.theme, p))}" placeholder="${esc(ph || '')}"></label>`;
+const rangeRow = (p, label, min, max, step, unit) => { const v = get(S.theme, p); return `<div class="grp-in"><div class="row"><label for="${fid(p)}">${label}</label></div><div class="range"><input type="range" id="${fid(p)}" data-bind="${p}" data-type="num" min="${min}" max="${max}" step="${step}" value="${v}" data-out="o-${fid(p)}" data-unit="${unit}"><output id="o-${fid(p)}">${fmtUnit(v, unit)}</output></div></div>`; };
+const fmtUnit = (v, u) => u === 'em' ? (v > 0 ? '+' : '') + Number(v).toFixed(2) + 'em' : v + u;
+
+const SECTIONS = [
+  { id: 'brand', label: 'Logo & location' }, { id: 'template', label: 'Template' }, { id: 'colours', label: 'Colours' }, { id: 'fonts', label: 'Fonts' },
+  { id: 'shape', label: 'Shape' }, { id: 'photos', label: 'Dish photos' }, { id: 'links', label: 'Links & QR' }
+];
+const presetMini = (id, t) => `<div class="pv-mini">${phoneHTML(t, { screen: 'menu' })}</div>`;
+function panelHTML() {
+  const t = S.theme;
+  switch (S.section) {
+    case 'template': return `<h2>Template</h2><p class="intro">Switching keeps your logo, store name, brand and accent colours. Everything else takes the template's look.</p>
+      <div class="presets">${Object.keys(PRESETS).map(id => `<button class="preset" data-act="preset" data-id="${id}" aria-pressed="${t.preset === id}"><span class="preset-type" style="font-family:${pairOf(PRESETS[id].fontPair).h};text-transform:${PRESETS[id].heading.upper ? 'uppercase' : 'none'};letter-spacing:${PRESETS[id].heading.spacing}em;font-weight:${PRESETS[id].heading.weight};border-radius:${Math.min(PRESETS[id].shape.radius, 16)}px">Pho bo</span><b>${PRESETS[id].name}</b><span>${PRESETS[id].blurb}</span></button>`).join('')}</div>
+      <button class="choice" data-act="preset-current" aria-pressed="${t.preset === 'current'}" style="${t.preset === 'current' ? 'background:var(--mint)' : ''}"><span class="ci">${IC.restart}</span><span class="ct"><b>Keep my current look</b><span>The colours and style your store has today</span></span>${t.preset === 'current' ? '<span class="ck-pass">Selected</span>' : `<span class="chev">${IC.right}</span>`}</button>`;
+    case 'brand': if (!hasLogo(t)) return `<h2>Start with your logo</h2><p class="intro">We'll pull your brand colours from it, so your store looks like you from the first tap.</p>
+      <label class="choice" for="f-logo"><span class="ci mint">${IC.upload}</span><span class="ct"><b>Upload your logo</b><span>PNG, JPG or SVG, up to 5 MB</span></span><span class="chev">${IC.right}</span><input type="file" id="f-logo" class="sr" data-file="logo" accept=".png,.jpg,.jpeg,.svg,image/png,image/jpeg,image/svg+xml"></label>
+      <button class="choice" data-act="use-sample"><span class="ci">${IC.sparkle}</span><span class="ct"><b>Use a sample logo</b><span>Try the builder with Banh Mi Lane</span></span><span class="chev">${IC.right}</span></button>
+      ${S.logoErr ? `<p class="err">${esc(S.logoErr)}</p>` : ''}
+      <div class="grp">${textField('brand.name', 'Store location', 'e.g. Geelong')}</div>`;
+      return `<h2>Logo & location</h2><p class="intro">Your logo sits at the top of the menu, next to the store location.</p>
+      <div class="grp"><span class="eyebrow">Logo</span><div class="logo-row"><img src="${asset(t.brand.logo)}" alt="Current logo"><span class="pill pill-white pill-sm filebtn">${IC.upload}Replace logo<input type="file" id="f-logo" data-file="logo" accept=".png,.jpg,.jpeg,.svg,image/png,image/jpeg,image/svg+xml" aria-label="Replace logo"></span></div>
+      ${S.found.length ? `<div class="found"><span class="label">Colours in your logo</span>${S.found.map(h => `<div class="found-i"><i style="background:${h}"></i><code>${h.toUpperCase()}</code><button class="pill pill-white pill-sm" data-act="use-colour" data-role="brand" data-hex="${h}">Brand</button><button class="pill pill-white pill-sm" data-act="use-colour" data-role="accent" data-hex="${h}">Accent</button></div>`).join('')}</div>` : ''}
+      ${S.logoErr ? `<p class="err">${esc(S.logoErr)}</p>` : '<p class="note">PNG, JPG or SVG, up to 5 MB.</p>'}</div>
+      <div class="grp">${textField('brand.name', 'Store location', 'e.g. Geelong')}</div>`;
+    case 'colours': {
+      const P = palette(t); t.linkStyle = t.linkStyle || 'text';
+      const strip = list => `<div class="shades">${list.map(([l, h]) => `<span class="shade"><i style="background:${h}"></i>${l}</span>`).join('')}</div>`;
+      return `<h2>Colours</h2><p class="intro">Pick a few colours. Every colour in the design system is worked out from them, with contrast checked for you.</p>
+      <div class="grp divide"><span class="eyebrow">Brand</span>${colorRow('colors.brand', 'Brand', 'Buttons, selected tabs, icons')}
+        <div class="sub"><span class="label">Made from Brand</span>${strip([['Buttons', P.brandDark], ['Links', P.brandMid], ['Selected', P.brandPale], ['Tint', P.brandTint]])}</div>
+        ${colorRow('colors.accent', 'Accent', '"Popular" badges')}</div>
+      <div class="grp divide"><span class="eyebrow">Text</span>${colorRow('colors.text', 'Text', 'Headings and body')}
+        <div class="sub"><span class="label">Made from Text</span>${strip([['Primary', P.text1], ['Secondary', P.text2], ['Descriptions', P.text3], ['Disabled', P.text5]])}</div>
+        <div class="sub">${segRow('linkStyle', [['brand', 'Brand shade'], ['text', 'Text colour']], 'Dish names and links')}</div></div>
+      <div class="grp divide"><span class="eyebrow">Surfaces</span>${colorRow('colors.background', 'Background', 'Behind the menu')}${colorRow('colors.surface', 'Cards', 'Dish cards, pills and sheets')}</div>
+      <div class="grp divide"><span class="eyebrow">Details</span>${colorRow('colors.price', 'Price', 'Dish prices')}${colorRow('colors.nutrition', 'Nutrition', 'Calories next to the price')}${colorRow('colors.lines', 'Lines', 'Outlines on pills and search')}
+        <div class="sub"><span class="label">Made from Lines</span>${strip([['Outlines', t.colors.lines], ['Radio rings', P.borderStrong]])}</div></div>
+      <div class="grp"><span class="eyebrow">Status · fixed</span>${strip(STATUS)}<p class="note">These carry meaning, so they look the same in every store.</p></div>
+      <div class="grp"><span class="eyebrow">Readability</span><div id="checks"></div></div>
+      <div class="grp"><details class="adv"><summary>Classic settings (12)</summary><p class="note" style="margin-top:8px">Today's storefront still reads these. They are filled in from your colours when you publish.</p><div class="classic" id="classic"></div></details></div>`;
+    }
+    case 'fonts': {
+      const cf = t.customFonts || {}, brand = !!(cf.heading || cf.body);
+      const names = [cf.heading && cf.heading.name, cf.body && cf.body.name].filter(Boolean).join(' · ');
+      return `<h2>Fonts</h2><p class="intro">Pick a font pairing, or use your own brand fonts. Then shape how headings look.</p>
+      <div class="grp"><span class="eyebrow">Theme fonts</span><div class="pairs">${FONT_PAIRS.map(p => `<button class="pairb" data-act="pair" data-id="${p.id}" aria-pressed="${!brand && t.fontPair === p.id}"><span class="ph" style="font-family:${p.h};font-weight:700">Pho bo</span><span class="pb" style="font-family:${p.b}">Slow-cooked beef broth</span><span class="pn">${p.name}</span></button>`).join('')}</div>
+        <span class="eyebrow" style="margin-top:4px">Or</span>
+        <button class="choice brandfont" data-act="brand-fonts" aria-pressed="${brand}"><span class="ci${brand ? ' mint' : ''}" style="font-family:'NomniHeading', ${pairOf(t.fontPair).h};font-size:18px;font-weight:700">Aa</span><span class="ct"><b>Use your brand fonts</b><span>${brand ? esc(names) : 'Upload your own font files instead of a pairing'}</span></span><span class="chev">${IC.right}</span></button></div>
+      <div class="grp"><span class="eyebrow">Titles</span>${togRow('heading.upper', 'Uppercase titles')}${rangeRow('heading.spacing', 'Letter spacing', -0.02, 0.12, 0.01, 'em')}${segRow('heading.weight', [[400, 'Regular'], [600, 'Semibold']], 'Weight', true)}<p class="note">Applies to page, sheet and section titles. Your design system uses Semibold for all emphasis, so dish names and buttons stay Semibold.</p></div>`;
+    }
+    case 'photos': { const ph = photosOf(t);
+      return `<h2>Dish photos</h2><p class="intro">How dish photos appear on your menu.</p>
+      <div class="grp">${togRow('photos.show', 'Show dish photos', 'Turn off for a text-only menu')}</div>
+      ${ph.show ? `<div class="grp">${segRow('photos.layout', [['list', 'List'], ['grid', 'Grid']], 'Layout')}<p class="note">List puts the photo beside the dish; Grid shows two dishes per row with the photo on top. On desktop dishes always show as a list.</p>
+        ${ph.layout === 'list' ? segRow('photos.size', [['s', 'Small'], ['m', 'Medium'], ['l', 'Large']], 'Photo size') : ''}</div>` : '<p class="note" style="margin:0 6px">Badges such as "Popular" sit on the photo, so they hide with it.</p>'}`;
+    }
+    case 'shape': tabsOf(t); return `<h2>Shape</h2><p class="intro">How round the dish cards, pills, tabs and sheets are. 0 is square.</p>
+      <div class="grp">${rangeRow('shape.radius', 'Corner radius', 0, 24, 1, ' px')}</div>
+      <div class="grp"><span class="eyebrow">Category tabs</span><p class="note">The selected meal category, such as Meal deals or Pho.</p>${(tabsOf(t), segRow('tabs.style', [['outline', 'Outline'], ['filled', 'Filled'], ['underline', 'Underline']], 'Style'))}
+        ${togRow('tabs.matchBrand', 'Use brand colour')}${t.tabs.matchBrand ? '' : colorRow('tabs.color', 'Tab colour')}</div>`;
+    case 'layout': return `<h2>Menu layout</h2><p class="intro">How the menu is arranged.</p>${realNote()}
+      <div class="grp">${segRow('layout.items', [['list', 'List'], ['tile', 'Tiles']], 'Items')}${segRow('layout.tabs', [['pill', 'Pills'], ['underline', 'Underline']], 'Category tabs')}${segRow('layout.header', [['plain', 'Plain'], ['brand', 'Brand colour']], 'Header')}${togRow('layout.photos', 'Food photos')}</div>`;
+    case 'header': return `<h2>Header</h2><p class="intro">Choose what sits above the menu.</p>${realNote()}
+      <div class="grp divide">${togRow('widgets.location', 'Location and order type', 'Pick up, delivery or dine in')}${togRow('widgets.time', 'Time picker')}${togRow('widgets.loyalty', 'Loyalty pill', 'Points and balance')}${togRow('widgets.search', 'Search')}${togRow('widgets.cart', 'Cart button')}</div>`;
+    case 'items': return `<h2>Item cards</h2><p class="intro">What each dish shows.</p>${realNote()}
+      <div class="grp">${segRow('item.image', [['left', 'Left'], ['right', 'Right'], ['bleed', 'Edge to edge']], 'Image')}${t.layout.items === 'tile' ? '<p class="note">Tiles always show the image on top.</p>' : ''}</div>
+      <div class="grp divide">${togRow('item.desc', 'Description')}${togRow('item.from', '"From" price', 'For dishes with sizes')}${togRow('item.badges', 'Badges', 'Popular, Best seller')}</div>
+      <div class="grp">${segRow('item.energy', [['kJ', 'kJ'], ['cal', 'Cal'], ['off', 'Off']], 'Energy')}</div>`;
+    case 'links': {
+      const live = 'https://w.abacus.co/Store/banh-mi-lane';
+      return `<h2>Links & QR</h2><p class="intro">Your store is always live at this link. Publishing updates what it shows.</p>
+      <div class="grp"><span class="eyebrow">Store link</span><div class="linkrow"><input id="f-livelink" readonly value="${live}" aria-label="Store link"><button class="pill pill-dark pill-sm" data-act="copy" data-target="f-livelink">Copy</button></div><p class="note">Sample link for this prototype.</p></div>
+      <div class="grp"><span class="eyebrow">Counter QR</span><div class="qrgrid"><div class="qrbox" id="qrCounter"></div><p class="note">Print for the counter. Opens your menu with pick up selected.</p></div></div>
+      <div class="grp"><span class="eyebrow">Table QR</span><label class="tf" for="f-table"><span class="label">Table number</span><input id="f-table" inputmode="numeric" value="${S.table || 12}"></label><div class="qrgrid"><div class="qrbox" id="qrTable"></div><p class="note" id="tableNote">Table ${S.table || 12}. Orders go to this table as dine in.</p></div></div>`;
+    }
+  }
+  return '';
+}
+function qrInto(id, text) { const el = $('#' + id); if (!el) return; el.innerHTML = ''; if (window.QRCode) new QRCode(el, { text, width: 132, height: 132, colorDark: '#0E3727', colorLight: '#ffffff', correctLevel: QRCode.CorrectLevel.M }); else el.textContent = 'QR unavailable'; }
+function afterPanel() {
+  if (S.section === 'links') { qrInto('qrCounter', 'https://w.abacus.co/Store/banh-mi-lane?type=pickup'); qrInto('qrTable', 'https://w.abacus.co/Store/banh-mi-lane?table=' + (S.table || 12)); }
+  refreshChecks(); setupScale();
+}
+function renderPanel() {
+  const p = $('#panel'); if (!p) return; const y = p.scrollTop;
+  p.innerHTML = panelHTML(); p.scrollTop = y;
+  $$('.rail-b[data-id]').forEach(b => b.setAttribute('aria-current', String(b.dataset.id === S.section)));
+  afterPanel();
+}
+
+/* ---------- editor shell ---------- */
+const SEC_ICON = { photos: 'items', template: 'template', brand: 'brand', colours: 'colours', fonts: 'fonts', shape: 'shape', layout: 'layout', header: 'header', items: 'items', links: 'links' };
+const SCREENS = [['menu', 'Menu'], ['item', 'Item'], ['cart', 'Cart'], ['setup', 'Order setup'], ['checkout', 'Checkout']];
+const devSeg = (act, cur, opts) => `<div class="seg" role="group" aria-label="Device">${opts.map(([v, l]) => `<button type="button" data-act="${act}" data-id="${v}" aria-pressed="${cur === v}">${l}</button>`).join('')}</div>`;
+const viewSeg = () => `<div class="seg" role="group" aria-label="Preview">${[['real', 'Storefront'], ['sample', 'Sample layout']].map(([v, l]) => `<button type="button" data-act="view" data-id="${v}" aria-pressed="${(realOn() ? 'real' : 'sample') === v}">${l}</button>`).join('')}</div>`;
+const realNote = () => realOn() ? `<p class="note">These settings show in Sample layout. The storefront keeps its own layout; colours, fonts and corner radius apply to both.</p>` : '';
+const screenSeg = () => `<div class="seg" role="group" aria-label="Screen">${SCREENS.map(([v, l]) => `<button type="button" data-act="screen" data-id="${v}" aria-pressed="${S.screen === v}">${l}</button>`).join('')}</div>`;
+function renderEditor() {
+  const narrow = innerWidth < 980;
+  if (narrow && S.device === 'both') S.device = 'mobile';
+  app.innerHTML = `<div class="ed"><header class="top"><div class="top-l"><span class="wordmark">nomni</span><span class="crumb">Online Ordering / <b>Customise store</b></span><span class="loc-chip" id="locChip" hidden></span></div>
+    <div class="top-c">${devSeg('dev', S.device, [['mobile', 'Mobile'], ['desktop', 'Desktop']])}</div>
+    <div class="top-r"><span class="saved" id="saved"></span><span class="status" id="status"></span><button class="rb" data-act="undo" id="bUndo" title="Undo (Ctrl+Z)" aria-label="Undo">${IC.undo}</button><button class="rb" data-act="redo" id="bRedo" title="Redo (Ctrl+Shift+Z)" aria-label="Redo">${IC.redo}</button><button class="pill pill-green" data-act="share" id="bShare">Share preview</button><button class="pill pill-dark" data-act="publish" id="bPub">Publish</button></div></header>
+    <div class="main"><nav class="rail" aria-label="Sections">${SECTIONS.map(s => `<button class="rail-b" data-act="sec" data-id="${s.id}" aria-current="${S.section === s.id}">${IC[SEC_ICON[s.id]]}<span>${s.label}</span>${s.id === 'colours' ? '<i class="rail-n" id="checkN" hidden></i>' : ''}</button>`).join('')}<button class="rail-b rail-end" data-act="restart">${IC.restart}<span>Restart setup</span></button></nav>
+    <section class="panel" id="panel" aria-label="Settings">${panelHTML()}</section>
+    <main class="stage"><div class="frames" id="frames"></div></main></div></div>`;
+  renderFrames(); syncViewBar(); afterPanel(); refreshStatus(); syncFonts();
+}
+function refreshStatus() {
+  const st = $('#status'); if (!st) return;
+  const same = JSON.stringify(S.theme) === JSON.stringify(S.published);
+  st.className = 'status ' + (same ? 'live' : 'draft');
+  const ready = hasLogo(S.theme);
+  const lc = $('#locChip'); if (lc) { lc.hidden = !ready; lc.innerHTML = `${IC.pin}<span>Editing <b>${esc((S.theme.brand.name || '').trim() || 'Geelong')}</b></span>`; }
+  st.innerHTML = `<i></i>${!ready ? 'Draft · add your logo to start' : same ? 'Live' : 'Draft · unpublished changes'}`;
+  if (!ready) st.className = 'status draft';
+  for (const id of ['bShare', 'bPub']) { const b = $('#' + id); if (b) { b.disabled = !ready; b.title = ready ? '' : 'Add your logo first'; } }
+  const u = $('#bUndo'), r = $('#bRedo'); if (u) u.disabled = hi <= 0; if (r) r.disabled = hi >= H.length - 1;
+  const sv0 = $('#saved'); if (sv0) sv0.textContent = S.savedAt ? 'Draft saved ' + S.savedAt.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }) : '';
+}
+function rerenderAll() { renderPanel(); renderFrames(); refreshStatus(); syncFonts(); saveSoon(); }
+function live() { renderFrames(); refreshChecks(); refreshStatus(); }
+
+/* ---------- onboarding ---------- */
+function obTheme() {
+  const o = S.ob, t = buildTheme(o.preset, { brand: o.brand, accent: o.accent, brandInfo: { ...defaultBrand(), name: o.name || 'Geelong', logo: o.logo || 'placeholderLogo' } });
+  if (!o.logo) Object.assign(t.colors, SKELETON);
+  return t;
+}
+/* Setup runs inside the same shell as the editor: steps in the rail, the step's
+   controls in the panel, and the same live preview on the stage. */
+const OB_STEPS = [['1', 'Logo and location'], ['2', 'Editor']];
+function obPanelHTML() {
+  const o = S.ob;
+  if (o.step === 1) return `<span class="eyebrow" style="margin:4px 6px 0">Step 1 of 2</span><h2>Start with your logo</h2><p class="intro">We'll pull your brand colours from it, so your store looks like you from the first tap.</p>
+    <label class="choice" for="ob-logo"><span class="ci mint">${o.logo ? `<img src="${asset(o.logo)}" alt="">` : IC.upload}</span><span class="ct"><b>${o.logo ? 'Replace your logo' : 'Upload your logo'}</b><span>PNG, JPG or SVG, up to 5 MB</span></span><span class="chev">${IC.right}</span><input type="file" id="ob-logo" class="sr" data-file="ob-logo" accept=".png,.jpg,.jpeg,.svg,image/png,image/jpeg,image/svg+xml"></label>
+    ${o.logo ? '' : `<button class="choice" data-act="ob-sample"><span class="ci">${IC.sparkle}</span><span class="ct"><b>Use a sample logo</b><span>Try the builder with Banh Mi Lane</span></span><span class="chev">${IC.right}</span></button>`}
+    ${o.err ? `<p class="err">${esc(o.err)}</p>` : ''}
+    ${o.logo ? `<label class="field" for="ob-name"><span class="label">Store location</span><input id="ob-name" data-ob="name" value="${esc(o.name)}" placeholder="e.g. Geelong"></label>` : ''}
+    ${o.found.length ? `<div class="grp"><span class="eyebrow">Colours found in your logo</span><span class="k">Brand</span><div class="swrow">${o.found.map(h => `<button class="sw" style="background:${h}" data-act="ob-brand" data-hex="${h}" aria-pressed="${o.brand === h}" aria-label="Brand ${h}"></button>`).join('')}</div><span class="k">Accent</span><div class="swrow">${o.found.map(h => `<button class="sw" style="background:${h}" data-act="ob-accent" data-hex="${h}" aria-pressed="${o.accent === h}" aria-label="Accent ${h}"></button>`).join('')}</div><div class="row"><span class="note">You can fine-tune every colour in the editor.</span><button class="pill pill-white pill-sm" data-act="ob-swap">Swap</button></div></div>` : ''}
+    <div class="ob-cta"><button class="pill pill-dark pill-lg" style="flex:1" data-act="ob-next"${o.logo ? '' : ' disabled'}>Continue</button></div>`;
+  const pr = PRESETS[o.preset];
+  return `<span class="eyebrow" style="margin:4px 6px 0">Step 2 of 3</span><h2>Choose a theme</h2><p class="intro">Both wear your logo and colours. You can switch any time without losing them.</p>
+    <div class="seg on-white" role="group" aria-label="Theme">${Object.keys(PRESETS).map(id => `<button type="button" data-act="ob-preset" data-id="${id}" aria-pressed="${o.preset === id}" style="height:44px;font-size:15px">${PRESETS[id].name}</button>`).join('')}</div>
+    <div class="card preset-desc"><b>${pr.blurb}</b><span class="muted">${pr.long}</span></div>
+    <div class="ob-cta"><button class="pill pill-dark pill-lg" style="flex:1" data-act="ob-finish">Use this theme</button><button class="pill pill-grey" data-act="ob-back">Back</button></div>`;
+}
+function renderOnboarding() {
+  const o = S.ob;
+  S.theme = obTheme();
+  if (!$('.ed.setup')) {
+    const narrow = innerWidth < 980;
+    if (narrow && S.device === 'both') S.device = 'mobile';
+    app.innerHTML = `<div class="ed setup"><header class="top"><div class="top-l"><span class="wordmark">nomni</span><span class="crumb">Online Ordering / <b>Customise store</b></span></div>
+      <div class="top-c">${devSeg('dev', S.device, [['mobile', 'Mobile'], ['desktop', 'Desktop']])}</div>
+      <div class="top-r"><span class="status draft" id="obStatus"></span><button class="pill pill-grey" data-act="ob-keep">Keep my current look</button></div></header>
+      <div class="main"><nav class="rail" aria-label="Setup steps" id="obRail"></nav>
+      <section class="panel" id="panel" aria-label="Setup"></section>
+      <main class="stage"><div class="frames" id="frames"></div></main></div></div>`;
+  }
+  $('#obRail').innerHTML = OB_STEPS.map(([n, l], i) => `<button class="rail-b" data-act="ob-step" data-id="${i + 1}" aria-current="${o.step === i + 1}"${i + 1 > o.step || i === 1 ? ' disabled' : ''}><span class="step-n${i + 1 < o.step ? ' done' : ''}">${i + 1 < o.step ? '✓' : n}</span><span>${l}</span></button>`).join('');
+  $('#obStatus').innerHTML = `<i></i>Setup · step ${o.step} of 2`;
+  $('#panel').innerHTML = obPanelHTML();
+  renderFrames(); syncViewBar();
+}
+function finishOnboarding(keepCurrent) {
+  const o = S.ob, info = { ...defaultBrand(), name: o.name || 'Geelong', logo: o.logo || 'sampleLogo' };
+  S.published = currentLook(info);
+  S.theme = keepCurrent ? clone(S.published) : buildTheme(o.preset, { brand: o.brand, accent: o.accent, brandInfo: info });
+  S.onboarded = true; S.section = keepCurrent ? 'template' : 'colours'; S.found = o.found.slice();
+  resetHistory(); save(); render();
+  toast(keepCurrent ? 'Opened your current look' : 'Theme applied. Your changes stay in draft until you publish.');
+}
+
+/* logo colour extraction */
+function extractColours(src) {
+  return new Promise(res => {
+    const img = new Image();
+    img.onload = () => {
+      const n = 64, c = document.createElement('canvas'); c.width = c.height = n; const x = c.getContext('2d');
+      x.drawImage(img, 0, 0, n, n); let d; try { d = x.getImageData(0, 0, n, n).data; } catch (e) { return res([]); }
+      const b = {};
+      for (let i = 0; i < d.length; i += 4) {
+        if (d[i + 3] < 128) continue;
+        const r = d[i], g = d[i + 1], bl = d[i + 2], mx = Math.max(r, g, bl), mn = Math.min(r, g, bl), l = (mx + mn) / 510;
+        if (l > 0.93 || l < 0.07) continue;
+        const k = (r >> 4) + ',' + (g >> 4) + ',' + (bl >> 4);
+        const e = b[k] || (b[k] = { n: 0, r: 0, g: 0, b: 0, s: (mx - mn) / 255 }); e.n++; e.r += r; e.g += g; e.b += bl;
+      }
+      const list = Object.values(b).map(e => ({ hex: rgb2hex(e.r / e.n, e.g / e.n, e.b / e.n), score: e.n * (0.35 + e.s) })).sort((p, q) => q.score - p.score);
+      const out = []; for (const e of list) { if (out.every(h => dist(h, e.hex) > 60)) out.push(e.hex); if (out.length === 5) break; }
+      res(out);
+    };
+    img.onerror = () => res([]); img.src = src;
+  });
+}
+// Brand = the darker of the two strongest colours, so text in it reads on white; accent = the other.
+function pickRoles(found) { const top = found.slice(0, 2).sort((a, b) => contrast(b, '#ffffff') - contrast(a, '#ffffff')); return { brand: top[0] || null, accent: top[1] || null }; }
+const readFile = f => new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(r.result); r.onerror = rej; r.readAsDataURL(f); });
+async function useLogo(dataUrl, id) {
+  ASSETS[id] = dataUrl; const found = await extractColours(dataUrl);
+  return found;
+}
+
+/* ---------- modals ---------- */
+function openModal(html) { $('#modal').innerHTML = `<div class="modal-bg" data-act="close-bg"><div class="modal" role="dialog" aria-modal="true">${html}</div></div>`; $('#modal .modal button, #modal .modal input')?.focus(); }
+function closeModal() { $('#modal').innerHTML = ''; S.fontModal = false; }
+const fmtDate = d => d.toLocaleDateString('en-AU', { day: 'numeric', month: 'short', year: 'numeric' });
+function brandFontsModal() {
+  const t = S.theme, cf = t.customFonts || {};
+  const slot = (k, label) => `<div class="slot"><span class="sa" style="font-family:${k === 'heading' ? "'NomniHeading'," : "'NomniBody',"} ${pairOf(t.fontPair)[k === 'heading' ? 'h' : 'b']}">Aa</span><span class="sn"><b>${label}</b><span>${cf[k] ? esc(cf[k].name) : 'Not uploaded'}</span></span>${cf[k] ? `<button class="pill pill-grey pill-sm" data-act="font-remove" data-slot="${k}">Remove</button>` : `<span class="pill pill-dark pill-sm filebtn">Upload<input type="file" id="f-font-${k}" data-file="font-${k}" accept=".woff2,.woff,.ttf,.otf" aria-label="Upload ${label.toLowerCase()}"></span>`}</div>${S.fontErr[k] ? `<p class="err">${esc(S.fontErr[k])}</p>` : ''}`;
+  S.fontModal = true;
+  openModal(`<button class="rb modal-x" data-act="close" aria-label="Close">${IC.x}</button><h2>Use your brand fonts</h2><p class="muted">Your font files replace the theme fonts across your store.</p>
+    <div class="grp">${slot('heading', 'Heading font')}${slot('body', 'Body font')}<p class="note">WOFF2, WOFF, TTF or OTF, up to 2 MB each. If a file fails to load, customers see the ${pairOf(t.fontPair).name} pairing.</p></div>
+    <label class="chk" for="f-fontLicence"><input type="checkbox" id="f-fontLicence" data-bind="fontLicence" ${t.fontLicence ? 'checked' : ''}>I have a web licence for these fonts. Needed before you publish with them.</label>
+    <div class="mrow"><button class="pill pill-dark" data-act="close">Done</button></div>`);
+}
+function shareModal() {
+  const sh = S.share, exp = new Date(sh.created + sh.days * 864e5), link = `https://w.abacus.co/Store/banh-mi-lane/preview/${sh.token}`;
+  openModal(`<button class="rb modal-x" data-act="close" aria-label="Close">${IC.x}</button><h2>Share a draft preview</h2><p class="muted">Reviewers see your unpublished changes. Ordering is turned off in the preview.</p>
+    <div class="grp" style="background:var(--grey)"><span class="eyebrow">Link expires after</span><div class="seg" role="group" aria-label="Expiry">${[1, 7, 14].map(dn => `<button type="button" data-act="share-days" data-id="${dn}" aria-pressed="${sh.days === dn}">${dn} ${dn === 1 ? 'day' : 'days'}</button>`).join('')}</div>
+    <div class="linkrow"><input id="f-sharelink" readonly value="${link}" aria-label="Preview link"><button class="pill pill-dark pill-sm" data-act="copy" data-target="f-sharelink">Copy</button></div>
+    <div class="qrgrid"><div class="qrbox" id="qrShare"></div><p class="note">Expires ${fmtDate(exp)}. Sample link: in this prototype, Open preview shows what reviewers get.</p></div></div>
+    <div class="mrow"><button class="pill pill-grey" data-act="reset-link">Reset link</button><button class="pill pill-dark" data-act="open-preview">Open preview</button></div>`);
+  qrInto('qrShare', link);
+}
+const LABELS = { 'preset': 'Template', 'colors.brand': 'Brand colour', 'colors.accent': 'Accent colour', 'colors.background': 'Background', 'colors.text': 'Text colour', 'colors.surface': 'Surface', 'colors.price': 'Price colour', 'colors.lines': 'Lines', 'colors.promo': 'Promo band', 'colors.nutrition': 'Nutrition colour', 'fontPair': 'Font pairing', 'heading.upper': 'Uppercase headings', 'heading.spacing': 'Letter spacing', 'heading.weight': 'Heading weight', 'shape.radius': 'Corner radius', 'shape.card': 'Card style', 'shape.button': 'Button shape', 'layout.items': 'Item layout', 'layout.tabs': 'Category tabs', 'layout.header': 'Header style', 'layout.photos': 'Food photos', 'item.image': 'Item image', 'item.desc': 'Descriptions', 'item.from': '"From" price', 'item.energy': 'Energy', 'item.badges': 'Badges', 'widgets.location': 'Location picker', 'widgets.time': 'Time picker', 'widgets.loyalty': 'Loyalty pill', 'widgets.search': 'Search', 'widgets.cart': 'Cart button', 'brand.name': 'Store location', 'brand.logo': 'Logo', 'brand.bannerType': 'Banner type', 'brand.banner': 'Banner photo', 'brand.headline': 'Headline', 'brand.promo': 'Promo badge', 'fontLicence': 'Font licence', 'photos.show': 'Dish photos', 'photos.layout': 'Dish layout', 'photos.size': 'Photo size', 'linkStyle': 'Dish names and links', 'tabs.style': 'Category tab style', 'tabs.matchBrand': 'Category tab uses brand', 'tabs.color': 'Category tab colour' };
+function flat(o, p = '', out = {}) { for (const k in o) { const v = o[k], q = p ? p + '.' + k : k; if (v && typeof v === 'object') flat(v, q, out); else out[q] = v; } return out; }
+function diffList() {
+  const a = flat(S.published), b = flat(S.theme), keys = [...new Set([...Object.keys(a), ...Object.keys(b)])], seen = new Set(), rows = [];
+  for (const k of keys) {
+    if (a[k] === b[k]) continue;
+    let label = LABELS[k], vf;
+    if (k.startsWith('customFonts.')) { label = k.includes('heading') ? 'Heading font file' : 'Body font file'; vf = () => b[k.replace(/\.(id|name)$/, '.name')] ? 'Uploaded' : 'Removed'; }
+    if (!label || seen.has(label)) continue; seen.add(label);
+    const show = v => typeof v === 'boolean' ? (v ? 'On' : 'Off') : /^#[0-9a-f]{6}$/i.test(v) ? `<i style="background:${v}"></i>${v.toUpperCase()}` : k === 'fontPair' ? pairOf(v).name : k === 'preset' ? (PRESETS[v]?.name || 'Current look') : (k === 'brand.logo' || k === 'brand.banner') ? 'Updated' : esc(String(v ?? '—'));
+    rows.push(`<li><span>${label}</span><span class="dv">${vf ? vf() : `<s>${show(a[k])}</s> → ${show(b[k])}`}</span></li>`);
+  }
+  return rows;
+}
+function publishModal() {
+  const rows = diffList(), t = S.theme, needsLic = (t.customFonts.heading || t.customFonts.body) && !t.fontLicence;
+  const fails = checks(t).filter(x => x.ratio < x.min).length;
+  openModal(`<button class="rb modal-x" data-act="close" aria-label="Close">${IC.x}</button><h2>Publish to your live store</h2>
+    ${rows.length ? `<p class="muted">${rows.length} ${rows.length === 1 ? 'change goes' : 'changes go'} live at once on w.abacus.co/Store/banh-mi-lane.</p><ul class="diff">${rows.join('')}</ul>` : '<p class="muted">Nothing has changed since your last publish.</p>'}
+    ${fails ? `<div class="warnbox"><b>${fails} readability ${fails === 1 ? 'issue' : 'issues'}</b><span>Some text may be hard to read. Fix them in Colours, or publish anyway.</span></div>` : ''}
+    ${needsLic ? `<div class="warnbox"><b>Confirm your font licence</b><label class="chk" for="m-lic"><input type="checkbox" id="m-lic" data-act="lic">I have a web licence for the fonts I uploaded.</label></div>` : ''}
+    <div class="mrow"><button class="pill pill-grey" data-act="close">Cancel</button><button class="pill pill-dark" data-act="do-publish" id="bDoPub"${!rows.length || needsLic ? ' disabled' : ''}>Publish now</button></div>`);
+}
+function toast(msg) { const t = $('#toast'); t.innerHTML = `<i>✓</i>${esc(msg)}`; t.hidden = false; clearTimeout(toast.t); toast.t = setTimeout(() => { t.hidden = true; }, 2800); }
+
+/* ---------- share preview mode ---------- */
+function renderPreviewMode() {
+  const exp = new Date(S.share.created + S.share.days * 864e5);
+  app.innerHTML = `<div class="pvm"><div class="pv-bar"><span class="pv-tag">Draft preview</span><span class="pv-msg">Not live yet · Ordering is off for customers · Link expires ${fmtDate(exp)}</span><div class="pv-r">${devSeg('pv-dev', S.pvDevice, [['mobile', 'Mobile'], ['desktop', 'Desktop']])}<button class="pill pill-white pill-sm" data-act="exit-preview">Back to editor</button></div></div>
+    <main class="stage"><div class="frames" id="frames"></div></main></div>`;
+  renderFrames(); syncViewBar();
+}
+
+/* ---------- top-level render ---------- */
+/* No separate setup: the editor opens on Logo & location with a grey preview until a logo is added. */
+const hasLogo = t => t && t.brand.logo !== 'placeholderLogo';
+function freshStart() {
+  const info = { ...defaultBrand(), logo: 'placeholderLogo' };
+  S.published = currentLook(info);
+  S.theme = buildTheme('rolld', { brandInfo: info });
+  Object.assign(S.theme.colors, SKELETON);
+  S.onboarded = true; S.section = 'brand'; S.found = []; S.logoErr = '';
+  resetHistory();
+}
+// First logo: its colours seed the palette on the current template. Later logos only swap the image.
+function applyLogo(id, found) {
+  const t = S.theme, first = !hasLogo(t);
+  S.found = found; t.brand.logo = id;
+  if (first) {
+    const r = pickRoles(found);
+    S.theme = buildTheme(PRESETS[t.preset] ? t.preset : 'rolld', { brand: r.brand, accent: r.accent, brandInfo: t.brand, customFonts: t.customFonts, fontLicence: t.fontLicence });
+  }
+  commit(); rerenderAll();
+  toast(first ? 'Your colours are in. Fine-tune them in Colours.' : 'Logo updated. Use its colours below if you like.');
+}
+/* Returning merchant demo: Roll'd Geelong has already customised and published its look with Roll'd assets. */
+function returningStart() {
+  ASSETS.rolldLogo = new URL("rolld/Rolld Logo Color.png", location.href).href;
+  const t = buildTheme('rolld', { brand: '#173d31', accent: '#d0421b', brandInfo: { ...defaultBrand(), name: 'Geelong', logo: 'rolldLogo' } });
+  Object.assign(t.colors, { background: '#faf7f2', text: '#111111', surface: '#ffffff', price: '#d0421b', lines: '#dddddd', promo: '#173d31', nutrition: '#b0640f' });
+  t.linkStyle = 'brand'; t.fontPair = 'system'; t.heading = { upper: false, spacing: 0, weight: 600 }; t.shape = { radius: 14, card: 'border', button: 'pill' };
+  S.theme = t; S.published = clone(t); S.onboarded = true; S.section = 'colours'; S.logoErr = ''; S.savedAt = null;
+  S.found = ['#173d31', '#d0421b', '#e9c96a'];
+  resetHistory(); save();
+}
+function setPersona(v) {
+  S.persona = v;
+  $$('[data-act="persona"]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.id === v)));
+  if (v === 'returning') returningStart(); else { try { localStorage.removeItem(KEY); } catch (e) { /* ignore */ } S.onboarded = false; }
+  S.preview = false; render();
+  if (v === 'returning') toast("Welcome back. You're editing Roll'd Geelong's live look.");
+}
+function render() { closeModal(); if (!S.onboarded) freshStart(); if (S.preview) renderPreviewMode(); else renderEditor(); }
+
+/* ---------- events ---------- */
+document.addEventListener('click', async e => {
+  const a = e.target.closest('[data-act]');
+  const setBtn = e.target.closest('[data-set]');
+  if (setBtn) {
+    let v = setBtn.dataset.val; if (setBtn.dataset.type === 'num') v = Number(v);
+    setPath(S.theme, setBtn.dataset.set, v);
+    $$(`[data-set="${setBtn.dataset.set}"]`).forEach(b => b.setAttribute('aria-pressed', String(b === setBtn)));
+    live(); commit();
+    if (setBtn.dataset.set === 'linkStyle' || setBtn.dataset.set === 'photos.layout') renderPanel();
+    if (setBtn.dataset.set === 'brand.bannerType' || setBtn.dataset.set === 'layout.items' || setBtn.dataset.set === 'item.energy') renderPanel();
+    return;
+  }
+  if (!a) {
+    const hit = e.target.closest('.frames.clickable [data-sec]');
+    if (hit && !S.preview && S.onboarded) { S.section = hit.dataset.sec; renderPanel(); }
+    return;
+  }
+  const act = a.dataset.act, o = S.ob;
+  switch (act) {
+    case 'ob-sample': o.logo = 'sampleLogo'; o.err = ''; o.found = await extractColours(SAMPLE_LOGO); Object.assign(o, pickRoles(o.found)); renderOnboarding(); break;
+    case 'ob-brand': o.brand = a.dataset.hex; renderOnboarding(); break;
+    case 'ob-accent': o.accent = a.dataset.hex; renderOnboarding(); break;
+    case 'ob-swap': [o.brand, o.accent] = [o.accent, o.brand]; renderOnboarding(); break;
+    case 'ob-next': finishOnboarding(false); break;
+    case 'ob-back': o.step = 1; renderOnboarding(); break;
+    case 'ob-step': o.step = +a.dataset.id; renderOnboarding(); break;
+    case 'ob-preset': o.preset = a.dataset.id; renderOnboarding(); break;
+    case 'ob-finish': finishOnboarding(false); break;
+    case 'ob-keep': finishOnboarding(true); break;
+    case 'sec': S.section = a.dataset.id; renderPanel(); if (innerWidth < 980) $('#panel')?.scrollIntoView({ block: 'start' }); break;
+    case 'dev': S.device = a.dataset.id; $$('[data-act="dev"]').forEach(b => b.setAttribute('aria-pressed', String(b === a))); renderFrames(); break;
+    case 'pv-dev': S.pvDevice = a.dataset.id; renderPreviewMode(); break;
+    case 'view': S.view = a.dataset.id; if (S.view === 'real') PROTO_OK = PROTO_OK === false ? null : PROTO_OK; renderFrames(); syncViewBar(); if (S.onboarded && !S.preview) renderPanel(); break;
+    case 'screen': S.screen = a.dataset.id; $$('[data-act="screen"]').forEach(b => b.setAttribute('aria-pressed', String(b === a))); renderFrames(); break;
+    case 'shell': setShell(a.dataset.id); break;
+    case 'persona': setPersona(a.dataset.id); break;
+    case 'use-sample': applyLogo('sampleLogo', await extractColours(SAMPLE_LOGO)); break;
+    case 'preset-current': S.theme = currentLook({ ...S.theme.brand }); S.theme.customFonts = clone(S.published.customFonts || { heading: null, body: null }); commit(); rerenderAll(); toast('Back to your current look'); break;
+    case 'undo': undo(); break;
+    case 'redo': redo(); break;
+    case 'preset': { const t = S.theme; S.theme = buildTheme(a.dataset.id, { brand: t.colors.brand, accent: t.colors.accent, brandInfo: t.brand, customFonts: t.customFonts, fontLicence: t.fontLicence, tabs: tabsOf(t), linkStyle: t.linkStyle, photos: photosOf(t) }); if (!hasLogo(t)) Object.assign(S.theme.colors, SKELETON); commit(); rerenderAll(); toast(`Switched to ${PRESETS[a.dataset.id].name}`); break; }
+    case 'pair': { const cf = S.theme.customFonts, had = cf && (cf.heading || cf.body); S.theme.fontPair = a.dataset.id; if (had) { S.theme.customFonts = { heading: null, body: null }; commit(); rerenderAll(); toast('Switched to theme fonts. Undo to get your brand fonts back.'); } else { $$('[data-act="pair"]').forEach(b => b.setAttribute('aria-pressed', String(b === a))); live(); commit(); } break; }
+    case 'brand-fonts': brandFontsModal(); break;
+    case 'fix': { const x = checks(S.theme)[+a.dataset.i]; if (x.bgKey) S.theme.colors[x.bgKey] = fixBgOn(x.bg, x.min); else S.theme.colors[x.key] = fixFg(S.theme.colors[x.key], x.bg, x.min); commit(); rerenderAll(); toast(`Adjusted ${x.label.toLowerCase()}`); break; }
+    case 'use-colour': S.theme.colors[a.dataset.role] = a.dataset.hex; commit(); rerenderAll(); break;
+    case 'font-remove': S.theme.customFonts[a.dataset.slot] = null; S.fontErr[a.dataset.slot] = ''; commit(); rerenderAll(); if (S.fontModal) brandFontsModal(); break;
+    case 'copy': { const inp = $('#' + a.dataset.target); try { await navigator.clipboard.writeText(inp.value); toast('Link copied'); } catch (err) { inp.select(); toast('Link selected. Press Ctrl+C or Cmd+C to copy.'); } break; }
+    case 'share': shareModal(); break;
+    case 'share-days': S.share.days = +a.dataset.id; S.share.created = Date.now(); saveSoon(); shareModal(); break;
+    case 'reset-link': S.share = { ...S.share, token: newToken(), created: Date.now() }; saveSoon(); shareModal(); toast('New link made. The old one no longer works.'); break;
+    case 'open-preview': S.preview = true; render(); break;
+    case 'exit-preview': S.preview = false; render(); break;
+    case 'publish': publishModal(); break;
+    case 'lic': S.theme.fontLicence = a.checked; $('#bDoPub').disabled = !a.checked || !diffList().length; commit(); break;
+    case 'do-publish': S.published = clone(S.theme); save(); closeModal(); refreshStatus(); toast('Published. Your store is live with the new look.'); break;
+    case 'close': closeModal(); break;
+    case 'close-bg': if (e.target === a) closeModal(); break;
+    case 'restart': try { localStorage.removeItem(KEY); } catch (err) { /* ignore */ } S.onboarded = false; render(); break;
+  }
+});
+document.addEventListener('input', e => {
+  const el = e.target;
+  if (el.dataset.ob) { S.ob[el.dataset.ob] = el.value; S.theme = obTheme(); renderFrames(); return; }
+  if (el.id === 'f-table') { S.table = el.value.replace(/\D/g, '').slice(0, 4) || ''; const n = S.table || '1'; qrInto('qrTable', 'https://w.abacus.co/Store/banh-mi-lane?table=' + n); $('#tableNote').textContent = `Table ${n}. Orders go to this table as dine in.`; return; }
+  const p = el.dataset.bind; if (!p || !S.theme) return;
+  let v;
+  if (el.type === 'checkbox') v = el.checked;
+  else if (el.dataset.kind === 'hex') { const s = el.value.trim(); const m = /^#?([0-9a-f]{6})$/i.exec(s); if (!m) return; v = '#' + m[1].toLowerCase(); }
+  else if (el.dataset.type === 'num') v = Number(el.value);
+  else v = el.value;
+  setPath(S.theme, p, v);
+  $$(`[data-bind="${p}"]`).forEach(x => { if (x !== el && x.type !== 'checkbox') x.value = v; });
+  if (el.dataset.out) $('#' + el.dataset.out).textContent = fmtUnit(v, el.dataset.unit);
+  live();
+});
+document.addEventListener('change', async e => {
+  const el = e.target;
+  if (el.dataset.bind && S.theme) { commit(); if (S.section === 'colours' && /^colors\./.test(el.dataset.bind)) renderPanel(); if (el.dataset.bind === 'tabs.matchBrand' || el.dataset.bind === 'photos.show') renderPanel(); return; }
+  const kind = el.dataset.file; if (!kind || !el.files?.[0]) return;
+  const f = el.files[0];
+  if (kind === 'ob-logo' || kind === 'logo') {
+    const ok = /\.(png|jpe?g|svg)$/i.test(f.name), big = f.size > 5 * 1048576;
+    const msg = !ok ? 'Use a PNG, JPG or SVG file.' : big ? `That file is ${(f.size / 1048576).toFixed(1)} MB. Logos can be up to 5 MB.` : '';
+    if (kind === 'ob-logo') {
+      if (msg) { S.ob.err = msg; return renderOnboarding(); }
+      const id = 'logo-' + Date.now(), found = await useLogo(await readFile(f), id);
+      Object.assign(S.ob, { logo: id, found, err: '' }, pickRoles(found)); renderOnboarding();
+    } else {
+      if (msg) { S.logoErr = msg; return renderPanel(); }
+      const id = 'logo-' + Date.now(), found = await useLogo(await readFile(f), id); S.logoErr = '';
+      applyLogo(id, found);
+    }
+  } else if (kind === 'banner') {
+    if (!/\.(png|jpe?g)$/i.test(f.name) || f.size > 5 * 1048576) { toast('Use a PNG or JPG up to 5 MB.'); return; }
+    const id = 'banner-' + Date.now(); ASSETS[id] = await readFile(f); S.theme.brand.banner = id; commit(); rerenderAll();
+  } else if (kind.startsWith('font-')) {
+    const slot = kind.slice(5), ext = f.name.split('.').pop().toLowerCase();
+    S.fontErr[slot] = '';
+    if (!['woff2', 'woff', 'ttf', 'otf'].includes(ext)) S.fontErr[slot] = 'Use a WOFF2, WOFF, TTF or OTF file.';
+    else if (f.size > 2 * 1048576) S.fontErr[slot] = `That file is ${(f.size / 1048576).toFixed(1)} MB. Font files can be up to 2 MB.`;
+    if (S.fontErr[slot]) { renderPanel(); if (S.fontModal) brandFontsModal(); return; }
+    const id = 'font-' + slot + '-' + Date.now(); ASSETS[id] = await readFile(f);
+    try { await registerFont(slot, id); } catch (err) { delete ASSETS[id]; S.fontErr[slot] = 'This file could not be read as a font. Try exporting it again as WOFF2.'; renderPanel(); if (S.fontModal) brandFontsModal(); return; }
+    S.theme.customFonts[slot] = { id, name: f.name }; commit(); rerenderAll(); if (S.fontModal) brandFontsModal(); toast(`${slot === 'heading' ? 'Heading' : 'Body'} font added`);
+  }
+});
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && $('#modal').innerHTML) { closeModal(); return; }
+  if (!S.onboarded || S.preview) return;
+  const tag = e.target.tagName; if ((tag === 'INPUT' && e.target.type !== 'range' && e.target.type !== 'checkbox' && e.target.type !== 'color') || tag === 'TEXTAREA') return;
+  const mod = e.metaKey || e.ctrlKey;
+  if (mod && e.key.toLowerCase() === 'z') { e.preventDefault(); e.shiftKey ? redo() : undo(); }
+  else if (mod && e.key.toLowerCase() === 'y') { e.preventDefault(); redo(); }
+});
+let lastNarrow = innerWidth < 980;
+addEventListener('resize', () => { const n = innerWidth < 980; if (n !== lastNarrow && !S.preview) { lastNarrow = n; if (S.onboarded) renderEditor(); else { app.innerHTML = ''; renderOnboarding(); } } });
+
+function setShell(v) {
+  document.body.classList.toggle('dash', v === 'dash');
+  $$('[data-act="shell"]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.id === v)));
+  $('#addrText').textContent = v === 'dash' ? 'nomni POS · Online Ordering · Customise store' : 'onlineorderingthemebuilder.com';
+  try { localStorage.setItem(KEY + '-view', v); } catch (e) { /* per-visit only */ }
+}
+try { setShell(localStorage.getItem(KEY + '-view') || 'site'); } catch (e) { setShell('site'); }
+load();
+if (S.theme && ![400, 600].includes(S.theme.heading.weight)) S.theme.heading.weight = titleWeight(S.theme);
+if (S.theme && S.theme.brand.logo === 'rolldLogo') { ASSETS.rolldLogo = new URL("rolld/Rolld Logo Color.png", location.href).href; $$('[data-act="persona"]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.id === 'returning'))); }
+if (S.onboarded) resetHistory();
+render();
+</script>
+</body>
+</html>
